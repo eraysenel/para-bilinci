@@ -82,6 +82,7 @@
     <button data-tab="expenses">🧾 Giderler</button>
     <button data-tab="manage">🏷️ Sat & Borç</button>
     <button data-tab="tips">⚠️ Tuzaklar</button>
+    <button data-tab="danisman">🤖 AI Danışman</button>
   </nav>
 
   <section class="panel on" id="tab-panel">
@@ -201,6 +202,23 @@
     </div></div>
   </section>
 
+  <section class="panel" id="tab-danisman">
+    <div class="card">
+      <h2>🤖 AI Finans Danışmanı</h2>
+      <p class="muted" style="font-size:13px;margin:0 0 10px">Verilerine bakıp kişisel tasarruf önerileri verir. Bir soru sor ya da bir hızlı butona bas. (Veriler cihazından çıkmaz; yalnızca özet bilgi gönderilir.)</p>
+      <div id="aiChat" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <button class="act" style="background:var(--card2);color:var(--ink);border:1px solid var(--line);width:auto;font-size:12.5px;padding:9px 12px" onclick="aiAsk('Durumumu analiz et ve bana 3-5 somut, kişisel tasarruf önerisi ver.')">📊 Durumumu analiz et</button>
+        <button class="act" style="background:var(--card2);color:var(--ink);border:1px solid var(--line);width:auto;font-size:12.5px;padding:9px 12px" onclick="aiAsk('Borçlarımı en hızlı nasıl kapatabilirim? Net bir plan öner.')">🧱 Borç planı</button>
+        <button class="act" style="background:var(--card2);color:var(--ink);border:1px solid var(--line);width:auto;font-size:12.5px;padding:9px 12px" onclick="aiAsk('Bu ay en çok nereden sızdırıyorum, nereden kısabilirim?')">💧 Sızıntılarım</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input id="aiInput" placeholder="Bir finans sorusu sor..." style="flex:1" onkeydown="if(event.key==='Enter')aiSend()">
+        <button class="act pri" style="width:auto" id="aiSendBtn" onclick="aiSend()">Sor</button>
+      </div>
+    </div>
+  </section>
+
   <div class="card" style="text-align:center;border-color:var(--gold-d)">
     <h2 style="justify-content:center">🤝 Bu proje gönüllülerle büyüyor</h2>
     <p class="muted" style="font-size:13.5px;margin:0 auto 14px;max-width:540px">"Para Bilinci", <b>İyilik İçin Yapay Zeka</b> topluluğunun ücretsiz, herkese açık araçlarından biridir - kâr amacı gütmez. Sen de katkı vermek (yazılım, tasarım, içerik, alan uzmanlığı) ya da bir fikir paylaşmak istersen aramıza katıl.</p>
@@ -217,6 +235,61 @@
   function L(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
   settings=Object.assign(settings,L('ao_settings',{}));
   items=L('ao_items',[])||[]; expenses=L('ao_exp',[])||[]; sells=L('ao_sells',[])||[]; debts=L('ao_debts',[])||[];
+
+  var PROXY="https://iyilikicinai.doksandokuz3032.workers.dev/";
+  var SITEKEY="0x4AAAAAADsB1yi04fQ4PyVU";
+  var _ses=null;try{_ses=JSON.parse(localStorage.getItem('cf_ses')||'null');}catch(e){}
+  var _tsWid=null,_tsTok='',_tsW=null;
+  function _tsShow(b){var e=document.getElementById('ts-box');if(e)e.style.display=b?'block':'none';}
+  window.cfTsOnload=function(){try{_tsWid=turnstile.render('#ts-box',{sitekey:SITEKEY,size:'compact',callback:function(t){_tsTok=t;if(_tsW){_tsW(t);_tsW=null;}if(_sesOk())_tsShow(false);},'error-callback':function(){if(_tsW){_tsW('');_tsW=null;}}});if(_sesOk())_tsShow(false);}catch(e){}};
+  function _tsToken(){return new Promise(function(res){if(typeof turnstile==='undefined'||_tsWid===null){res('');return;}if(_tsTok){var t=_tsTok;_tsTok='';res(t);return;}_tsShow(true);_tsW=res;try{turnstile.reset(_tsWid);}catch(e){}});}
+  function _sesOk(){return _ses&&_ses.token&&_ses.exp&&Date.now()<_ses.exp-60000;}
+  async function ensureSession(){
+    if(_sesOk())return _ses.token;
+    var tt=await _tsToken();
+    if(!tt)throw new Error('Bot doğrulaması yüklenemedi - sol alttaki kutuyu işaretle, sonra tekrar dene.');
+    var r=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'auth',turnstileToken:tt})});
+    var d=await r.json();
+    if(!d.sessionToken)throw new Error((d.error||'oturum alınamadı')+(d.codes&&d.codes.length?(' ['+d.codes.join(', ')+']'):''));
+    _ses={token:d.sessionToken,exp:d.exp};try{localStorage.setItem('cf_ses',JSON.stringify(_ses));}catch(e){}
+    _tsShow(false);return _ses.token;
+  }
+  var aiHistory=[];
+  function aiContext(){
+    var mp=monthPrefix();
+    var me=expenses.filter(function(e){return (e.date||'').slice(0,7)===mp});
+    var ms=me.reduce(function(a,b){return a+b.amount},0);
+    var cm={};me.forEach(function(e){cm[e.cat]=(cm[e.cat]||0)+e.amount});
+    var cats=Object.keys(cm).sort(function(a,b){return cm[b]-cm[a]}).map(function(k){return k+' '+Math.round(cm[k])+'₺'}).join(', ');
+    var saved=items.filter(function(i){return i.status==='vazgetim'}).reduce(function(a,b){return a+b.price},0)+sells.filter(function(s){return s.status==='satildi'}).reduce(function(a,b){return a+b.price},0);
+    var dr=debts.reduce(function(a,b){return a+Math.max(b.total-b.paid,0)},0);
+    var ds=debts.map(function(d){return d.name+' kalan '+Math.round(Math.max(d.total-d.paid,0))+'₺'}).join('; ');
+    return 'Aylık gelir: '+(settings.income||'belirtilmemiş')+'₺. Aylık bütçe: '+(settings.budget||'belirtilmemiş')+'₺. Tasarruf hedefi: '+(settings.goal||'belirtilmemiş')+'₺. Bu ay harcanan: '+Math.round(ms)+'₺. Kategori dağılımı: '+(cats||'yok')+'. Vazgeçerek+satarak biriktirdiği: '+Math.round(saved)+'₺. Toplam kalan borç: '+Math.round(dr)+'₺'+(ds?' ('+ds+')':'')+'.';
+  }
+  function aiBub(role,text){
+    var c=document.getElementById('aiChat');var d=document.createElement('div');
+    d.style.cssText='max-width:90%;padding:10px 13px;border-radius:12px;font-size:14px;line-height:1.6;white-space:pre-wrap;'+(role==='user'?'align-self:flex-end;background:var(--card2);':'align-self:flex-start;background:rgba(232,194,90,.1);border:1px solid var(--line);');
+    d.textContent=text;c.appendChild(d);c.scrollTop=c.scrollHeight;return d;
+  }
+  function aiSend(){var i=document.getElementById('aiInput');var q=i.value.trim();if(!q)return;i.value='';aiAsk(q);}
+  async function aiAsk(q){
+    var btn=document.getElementById('aiSendBtn');if(btn)btn.disabled=true;
+    aiBub('user',q);aiHistory.push({role:'user',content:q});
+    var typing=aiBub('ai','💭 ...');
+    try{
+      var sys='Sen sıcak, gerçekçi ve yargılamayan bir kişisel finans danışmanısın. Türkçe, somut ve uygulanabilir tavsiye ver; gerektiğinde madde madde. Kısa tut. Yatırım garantisi verme; sağlıklı para alışkanlıkları öner. KULLANICININ GÜNCEL VERİSİ: '+aiContext();
+      var st=await ensureSession();
+      var msgs=[{role:'system',content:sys}].concat(aiHistory.slice(-10));
+      async function go(t){return fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,temperature:0.7,sessionToken:t})});}
+      var r=await go(st);
+      if(r.status===401){_ses=null;localStorage.removeItem('cf_ses');st=await ensureSession();r=await go(st);}
+      var d=await r.json();
+      if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
+      var reply=(d.choices&&d.choices[0]&&d.choices[0].message.content||'').trim();
+      typing.remove();aiBub('ai',reply||'Yanıt alınamadı.');aiHistory.push({role:'assistant',content:reply});
+    }catch(e){typing.remove();aiBub('ai','⚠️ Hata: '+e.message);}
+    if(btn)btn.disabled=false;
+  }
 
   function pad(n){return (n<10?'0':'')+n}
   function todayStr(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
@@ -338,5 +411,7 @@
   setInterval(function(){document.querySelectorAll('.cd').forEach(function(el){el.textContent=remainStr(+el.dataset.d)})},30000);
   render();
 </script>
+<div id="ts-box" style="position:fixed;bottom:10px;left:10px;z-index:99"></div>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=cfTsOnload" async defer></script>
 </body>
 </html>
