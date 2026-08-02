@@ -1,0 +1,248 @@
+/* =========================================================================
+   PARA BİLİNCİ — TASARIM SİSTEMİ
+   Koyu, sakin bir fintech yüzeyi; grafik renkleri doğrulanmış paletten
+   (mavi #3987e5 · turuncu #d95926 · deniz yeşili #199e70 — CVD güvenli).
+   ========================================================================= */
+
+:root{
+  --bg:#0b1016;            /* sayfa düzlemi */
+  --card:#141d24;          /* kart / grafik yüzeyi (palet bu yüzeyle doğrulandı) */
+  --card2:#1b2630;         /* iç kutu */
+  --line:#26323d;          /* çizgi */
+  --grid:#233039;          /* grafik ızgarası */
+  --ink:#f2f6fa;           /* birincil metin */
+  --ink2:#b9c5d1;          /* ikincil metin */
+  --muted:#8494a5;         /* sönük metin */
+  --acc:#2fbf8f;           /* ana eylem (zümrüt) */
+  --acc-d:#249e76;
+  --gold:#f4c150;          /* marka vurgusu */
+  --s1:#3987e5;            /* seri 1: mavi   (TÜİK, USD çizgisi) */
+  --s2:#d95926;            /* seri 2: turuncu (ENAG) */
+  --s3:#199e70;            /* seri 3: deniz yeşili */
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --up:#0ca30c; --down:#e66767;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:radial-gradient(1100px 500px at 50% -12%,#152230 0%,var(--bg) 58%);
+  color:var(--ink);line-height:1.55;min-height:100vh}
+.wrap{max-width:960px;margin:0 auto;padding:16px 14px 30px}
+
+/* ---------- başlık + canlı şerit ---------- */
+header{padding:10px 0 4px}
+.brand{text-align:center}
+.logo{font-size:26px;font-weight:800;letter-spacing:.2px}
+.logo b{color:var(--gold)}
+.tagline{color:var(--ink2);font-size:13.5px;max-width:600px;margin:6px auto 0}
+.ticker{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 4px;scrollbar-width:none}
+.ticker::-webkit-scrollbar{display:none}
+.tk{flex:1 0 auto;min-width:118px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:8px 12px;color:var(--ink);cursor:pointer;text-align:left;font:inherit}
+.tk:hover{border-color:var(--acc)}
+.tk .tl{display:block;font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.tk .tl small{text-transform:none;letter-spacing:0}
+.tk b{font-size:15px;font-variant-numeric:tabular-nums}
+.tk .chg{font-size:11px;font-weight:700;margin-left:5px}
+.chg.up{color:var(--up)}.chg.down{color:var(--down)}
+.src{color:var(--muted);font-size:11.5px;margin:6px 2px 0}
+
+/* ---------- sekmeler ---------- */
+nav{position:sticky;top:8px;z-index:20;display:flex;gap:4px;margin:12px 0 14px;
+  background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:14px;padding:5px;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:1 0 auto;min-width:96px;background:none;border:0;color:var(--muted);font-weight:700;
+  font-size:13px;padding:10px 8px;border-radius:10px;cursor:pointer;white-space:nowrap;font-family:inherit}
+nav button.on{background:var(--card2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+nav button:hover{color:var(--ink)}
+
+/* ---------- paneller & kartlar ---------- */
+.panel{display:none}.panel.on{display:block;animation:fadein .18s ease}
+@keyframes fadein{from{opacity:.4;transform:translateY(3px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 14px}
+.card.intro ol{margin:8px 0;padding-left:20px}
+.card.intro li{margin:4px 0}
+h2{font-size:16px;margin:0 0 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h3{font-size:13.5px;margin:16px 0 8px;color:var(--ink2)}
+.sub{font-size:12px;color:var(--muted);font-weight:500}
+p{margin:6px 0}
+.muted{color:var(--muted);font-size:13px}
+.note{color:var(--ink2);font-size:12.5px;margin-top:8px}
+.gold{color:var(--gold)}.green{color:var(--acc)}.red{color:var(--down)}
+
+/* ---------- form ---------- */
+label{display:block;font-size:11.5px;color:var(--muted);font-weight:600;margin:10px 0 4px}
+input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;font-size:15px;
+  background:var(--bg);color:var(--ink);font-family:inherit}
+input:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px;border-color:transparent}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
+.grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;align-items:end}
+.grid4{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;align-items:end}
+.btncell{display:flex;align-items:flex-end}
+.btncell .act{width:100%}
+.chkcell{display:flex;align-items:center;padding-bottom:10px}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ink2);font-weight:500;margin:0;cursor:pointer}
+.chk input{width:auto}
+button.act{border:0;border-radius:11px;padding:12px 14px;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit}
+.pri{background:var(--acc);color:#04231a}.pri:hover{background:var(--acc-d)}
+.em{background:var(--s1);color:#fff}.em:hover{filter:brightness(1.1)}
+.ghost{background:var(--card2);color:var(--ink);border:1px solid var(--line);font-weight:700;font-size:12.5px;padding:9px 12px}
+.ghost:hover{border-color:var(--acc)}
+.full{width:100%;margin-top:12px}
+.mini{background:none;border:0;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;padding:0;font-family:inherit}
+.mini:hover{color:var(--ink)}
+.toolrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.toolrow .act{flex:1 1 auto}
+
+/* ---------- istatistik kutuları ---------- */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 10px}
+.stats.s4{grid-template-columns:repeat(4,1fr)}
+.stat{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:12px 10px;text-align:center}
+.stat .v{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.stat .l{font-size:11px;color:var(--muted);margin-top:3px}
+.stat .s{font-size:10.5px;color:var(--muted)}
+.statInline{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.statInline .v{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+.statInline .l{font-size:11px;color:var(--muted)}
+
+/* ---------- kota / progress ---------- */
+.quota{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-top:12px}
+.quota .l{font-size:11.5px;color:var(--muted)}
+.quota .big{font-size:26px;font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums}
+.quota .big2{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.quota .right{text-align:right}
+.bar{height:12px;background:var(--bg);border-radius:999px;overflow:hidden;border:1px solid var(--line);margin-top:8px}
+.bar>i{display:block;height:100%;width:0;background:var(--acc);border-radius:999px;transition:width .3s}
+.bar>i.over{background:var(--critical)}
+
+/* ---------- hedef para kartı ---------- */
+.goalcard{border-color:color-mix(in srgb,var(--gold) 40%,var(--line))}
+.goalnums{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-top:12px}
+.goalnums .l{font-size:11.5px;color:var(--muted)}
+.goalnums .big{font-size:26px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.goalnums .mid{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+.bar>i.goldbar{background:var(--gold)}
+.streak{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.schip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--ink2)}
+.schip b{color:var(--ink);font-variant-numeric:tabular-nums}
+.schip.hot{border-color:color-mix(in srgb,var(--gold) 50%,var(--line));color:var(--gold)}
+.schip.hot b{color:var(--gold)}
+
+/* ---------- erime kutusu ---------- */
+.melt{margin-top:12px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.melt #meltSpark{margin-top:8px}
+
+/* ---------- grafikler ---------- */
+.chartbox{position:relative;margin-top:6px}
+.chartbox svg{display:block;width:100%;height:auto}
+.chartbox.sm svg{max-height:150px}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink2);margin:2px 0 4px}
+.legend .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.dot.d1{background:var(--s1)}.dot.d2{background:var(--s2)}
+.tooltip{position:absolute;pointer-events:none;background:#0b1016f0;border:1px solid var(--line);
+  border-radius:8px;padding:6px 9px;font-size:12px;white-space:nowrap;z-index:5;display:none;
+  font-variant-numeric:tabular-nums}
+.tooltip b{color:var(--ink)}
+
+/* ---------- kategori / bar satırları ---------- */
+.catrow{display:grid;grid-template-columns:150px 1fr 64px;gap:10px;align-items:center;margin:7px 0;font-size:13px}
+.catrow .nm{color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.catrow .val{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.track{height:14px;background:var(--bg);border-radius:5px;overflow:hidden;border:1px solid var(--line)}
+.track>i{display:block;height:100%;background:var(--s1);border-radius:0 4px 4px 0;min-width:2px}
+.track>i.hot{background:var(--s2)}
+
+/* ---------- listeler ---------- */
+.item{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0 0;background:var(--card2)}
+.item .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.item .nm{font-weight:700}
+.item .pr{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.item .meta{font-size:12.5px;color:var(--muted);margin-top:4px}
+.acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.acts button{flex:1;border:0;border-radius:10px;padding:9px;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit}
+.a-ok{background:color-mix(in srgb,var(--acc) 18%,transparent);color:var(--acc)}
+.a-no{background:color-mix(in srgb,var(--critical) 16%,transparent);color:#f0928f}
+.a-plain{background:var(--bg);color:var(--ink2);border:1px solid var(--line)}
+.badge{font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 9px;margin-left:6px;white-space:nowrap}
+.b-late{background:color-mix(in srgb,var(--critical) 22%,transparent);color:#f0928f}
+.b-today{background:color-mix(in srgb,var(--serious) 22%,transparent);color:var(--serious)}
+.b-soon{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.b-ok{background:color-mix(in srgb,var(--good) 18%,transparent);color:#6fd06f}
+.b-paid{background:var(--bg);color:var(--muted)}
+.tag{font-size:10.5px;font-weight:700;border-radius:999px;padding:2px 8px;margin-left:6px}
+.tag.istek{background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold)}
+.tag.ihtiyac{background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc)}
+.seg{display:flex;gap:8px;margin-top:10px}
+.seg button{flex:1;padding:10px;border:1px solid var(--line);background:var(--bg);border-radius:10px;
+  font-weight:700;cursor:pointer;font-size:13px;color:var(--muted);font-family:inherit}
+.seg button.on{background:color-mix(in srgb,var(--acc) 14%,transparent);border-color:var(--acc);color:var(--acc)}
+.cost{margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--gold)}
+.empty{color:var(--muted);font-size:13px;text-align:center;padding:14px 0}
+
+/* ---------- tablo ---------- */
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:11.5px}
+th.r,td.r{text-align:right}
+td.r{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.xx{background:none;border:0;color:var(--muted);cursor:pointer;font-size:14px;font-family:inherit}
+.xx:hover{color:var(--down)}
+
+/* ---------- plan adımları ---------- */
+.pstep{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;
+  border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:8px 0 0;background:var(--card2)}
+.pstep .no{width:26px;height:26px;border-radius:50%;background:var(--bg);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:var(--acc)}
+.pstep .t{font-size:13.5px}.pstep .t small{display:block;color:var(--muted);font-size:11.5px}
+.pstep .v{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ---------- kredi notu bandı ---------- */
+.bandbar{display:flex;height:20px;border-radius:8px;overflow:hidden;margin:12px 0 4px;border:1px solid var(--line)}
+.bandbar i{height:100%;position:relative}
+.bandlbl{display:flex;font-size:10px;color:var(--muted)}
+.bandlbl span{text-align:center;overflow:hidden;white-space:nowrap}
+.bandptr{position:relative;height:14px;margin-top:2px}
+.bandptr i{position:absolute;transform:translateX(-50%);font-style:normal;font-size:13px}
+
+/* ---------- rehber / accordion ---------- */
+details.guide{border:1px solid var(--line);border-radius:12px;background:var(--card2);
+  padding:0 14px;margin:10px 0 0;overflow:hidden}
+details.guide summary{cursor:pointer;font-weight:700;font-size:13.5px;padding:12px 0;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details.guide summary::after{content:"+";color:var(--muted);font-weight:800}
+details.guide[open] summary::after{content:"−"}
+details.guide p,details.guide ul{font-size:13px;color:var(--ink2);margin:0 0 12px}
+details.guide li{margin:5px 0}
+
+/* ---------- ipuçları ---------- */
+.tips{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tip{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.tip .h{font-weight:700;font-size:13.5px;margin-bottom:3px}
+.tip p{margin:0;font-size:12.5px;color:var(--muted)}
+.trap .h{color:var(--serious)}.good .h{color:var(--acc)}
+
+/* ---------- AI sohbet ---------- */
+#aiChat{display:flex;flex-direction:column;gap:10px;margin:10px 0}
+.bub{max-width:90%;padding:10px 13px;border-radius:12px;font-size:14px;line-height:1.6;white-space:pre-wrap}
+.bub.user{align-self:flex-end;background:var(--card2)}
+.bub.ai{align-self:flex-start;background:color-mix(in srgb,var(--s1) 10%,transparent);border:1px solid var(--line)}
+.chatrow{display:flex;gap:8px;margin-top:8px}
+.chatrow input{flex:1}
+.chatrow .act{width:auto}
+
+/* ---------- alt bilgi ---------- */
+.volunteer{text-align:center;border-color:color-mix(in srgb,var(--gold) 45%,var(--line))}
+.volunteer .act{display:inline-block;text-decoration:none;margin-top:8px}
+.priv{color:#5f7186;font-size:12px;text-align:center;padding:8px 0 22px}
+.priv a{color:var(--gold)}
+#ts-box{position:fixed;bottom:10px;left:10px;z-index:99}
+
+/* ---------- mobil ---------- */
+@media(max-width:640px){
+  .stats,.stats.s4{grid-template-columns:repeat(2,1fr)}
+  .row2,.grid3,.grid4,.tips{grid-template-columns:1fr}
+  .catrow{grid-template-columns:104px 1fr 58px;font-size:12px}
+  nav{top:4px}
+  nav button{min-width:84px;font-size:12px}
+  .quota .big{font-size:22px}
+}
