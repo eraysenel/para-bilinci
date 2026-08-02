@@ -29,6 +29,8 @@ function monthPrefix() { return todayStr().slice(0, 7); }
 function daysInMonth() { var d = new Date(); return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); }
 function uid(p) { return p + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36); }
 function L(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+/* Formu durumdan doldururken o an yazılan inputun üzerine yazma */
+function setVal(id, v) { var el = $(id); if (el && el !== document.activeElement) el.value = v; }
 function S(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
 /* ============================== DURUM (STATE) ============================== */
@@ -249,6 +251,13 @@ if (location.hash && $("sec-" + location.hash.slice(1))) showTab(location.hash.s
 
 /* ============================== PANEL ============================== */
 function bindPanel() {
+  [["goalName", "name"], ["goalAmt", "amount"], ["goalDate", "date"]].forEach(function (p) {
+    $(p[0]).addEventListener("change", function () {
+      if (!ST.settings.goal) ST.settings.goal = { name: "", amount: 0, date: "" };
+      ST.settings.goal[p[1]] = p[1] === "amount" ? num($(p[0]).value) : $(p[0]).value.trim();
+      persist(); renderAll();
+    });
+  });
   [["aTL", "tl"], ["aUSD", "usd"], ["aEUR", "eur"], ["aAU", "au"]].forEach(function (p) {
     $(p[0]).addEventListener("change", function () {
       ST.assets[p[1]] = num($(p[0]).value); persist(); renderAll();
@@ -258,10 +267,82 @@ function bindPanel() {
     ST.settings.lifeBudget = num($("lifeBudget").value); persist(); renderAll();
   });
 }
+/* Disiplin ölçümü: son 30 günde günlük yaşam kotası içinde kalınan günler.
+   Yalnızca kayıt tutulan dönem sayılır — kayıtsız günlere disiplin puanı yazılmaz. */
+function disciplineStats() {
+  var budget = ST.settings.lifeBudget || 0;
+  if (budget <= 0 || !ST.expenses.length) return null;
+  var ref = budget / daysInMonth();
+  var firstDate = ST.expenses.reduce(function (a, e) { return e.date < a ? e.date : a; }, "9999-12-31");
+  var days = 0, ok = 0, streak = 0, streakAlive = true;
+  for (var i = 0; i < 30; i++) {
+    var d = new Date(); d.setDate(d.getDate() - i);
+    var ds = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+    if (ds < firstDate) break; // kayıt başlamadan önceki günler ölçüme girmez
+    var spent = ST.expenses.filter(function (e) { return e.date === ds && e.cat !== "Fatura" && e.cat !== "Kira"; })
+      .reduce(function (a, b) { return a + b.amount; }, 0);
+    var inQuota = spent <= ref;
+    days++; if (inQuota) ok++;
+    if (streakAlive) { if (inQuota) streak++; else streakAlive = false; }
+  }
+  return { days: days, ok: ok, streak: streak, ref: ref };
+}
+function renderGoal() {
+  var g = ST.settings.goal || { name: "", amount: 0, date: "" };
+  setVal("goalName", g.name || ""); setVal("goalAmt", g.amount || ""); setVal("goalDate", g.date || "");
+  var box = $("goalOut");
+  if (!(g.amount > 0)) {
+    box.innerHTML = '<p class="note">Rakamı olmayan hedef, dilektir. Bir tutar yaz — motivasyonu rakam verir, sonucu <b>disiplin</b> getirir.</p>';
+    return;
+  }
+  var cur = assetsTL(), pct = Math.min(cur / g.amount * 100, 100), remaining = Math.max(g.amount - cur, 0);
+  var s = MK.spot || {};
+  var html = '<div class="goalnums">' +
+    '<div><div class="l">' + (g.name ? esc(g.name) : "Hedef") + "</div><div class=\"big\">" + fmtTL(g.amount) +
+    (s.usdtry ? ' <span class="l">(≈ ' + fmtUSD(g.amount / s.usdtry) + ")</span>" : "") + "</div></div>" +
+    '<div style="text-align:right"><div class="l">Varlıklarının bugünkü değeri</div><div class="mid">' + fmtTL(cur) + "</div></div></div>" +
+    '<div class="bar"><i class="goldbar" style="width:' + pct.toFixed(1) + '%"></i></div>';
+  if (cur >= g.amount) {
+    html += '<p class="note">🎉 <b>Hedef tamam.</b> Bunu motivasyon değil disiplin yaptı — aynı düzenle yeni hedefi yaz, çıtayı yükselt.</p>';
+  } else {
+    html += '<p class="note">Hedefe kalan: <b class="gold">' + fmtTL(remaining) + "</b> (doluluk: %" + Math.round(pct) + ").";
+    if (g.date && /^\d{4}-\d{2}$/.test(g.date)) {
+      var now = new Date();
+      var monthsLeft = (+g.date.slice(0, 4) - now.getFullYear()) * 12 + (+g.date.slice(5, 7) - (now.getMonth() + 1));
+      if (monthsLeft <= 0) {
+        html += " Hedef tarihi geldi/geçti — tarihi güncelle ya da tempoyu konuşalım.";
+      } else {
+        var need = remaining / monthsLeft;
+        var investable = incomeTotal() - (billsMonthly() + instMonthly()) - (ST.settings.lifeBudget || 0);
+        html += " Kalan <b>" + monthsLeft + " ayda</b> ayda ≈ <b>" + fmtTL(need) + "</b> ayırman gerek.";
+        if (incomeTotal() > 0 && ST.settings.lifeBudget > 0) {
+          html += investable >= need
+            ? " Planındaki yatırılabilir tutar (" + fmtTL(investable) + ") bu tempoyu <b class='green'>karşılıyor ✓</b> — iş, her ay aksatmamakta."
+            : " Planındaki yatırılabilir tutar (" + fmtTL(Math.max(investable, 0)) + ") bu temponun <b class='red'>altında</b> — ya tarih uzayacak ya giderler kısılacak. Grafik bunu krizden önce söyledi.";
+        }
+      }
+    }
+    html += "</p>";
+  }
+  var d = disciplineStats();
+  if (d) {
+    html += '<div class="streak">' +
+      '<span class="schip' + (d.streak >= 3 ? " hot" : "") + '">🔥 Seri: <b>' + d.streak + " gün</b> kota içinde</span>" +
+      '<span class="schip">Son ' + d.days + " günün <b>" + d.ok + "</b> günü disiplinli</span>" +
+      '<span class="schip">Günlük referans: <b>' + fmtTL(d.ref) + "</b></span></div>";
+    html += '<p class="note">' + (d.streak >= 7 ? "Bu seri artık alışkanlık olmaya başladı — hedefi getiren tam olarak bu."
+      : d.streak >= 3 ? "Seri büyüyor. Hatırla: tek büyük fedakârlık değil, sıradan günlerin toplamı kazandırır."
+      : "Seri bozulunca sıfırlanır ama emek sıfırlanmaz — bugün yeniden başla, grafik yarın yine sayar.") + "</p>";
+  } else {
+    html += '<p class="note">Disiplin ölçümü için Panel\'den aylık yaşam bütçeni gir ve harcamalarını kaydet — kota içinde geçen her gün seriye yazılır.</p>';
+  }
+  box.innerHTML = html;
+}
 function renderPanel() {
+  renderGoal();
   var s = ST.settings, a = ST.assets;
-  $("aTL").value = a.tl || ""; $("aUSD").value = a.usd || ""; $("aEUR").value = a.eur || ""; $("aAU").value = a.au || "";
-  $("lifeBudget").value = s.lifeBudget || "";
+  setVal("aTL", a.tl || ""); setVal("aUSD", a.usd || ""); setVal("aEUR", a.eur || ""); setVal("aAU", a.au || "");
+  setVal("lifeBudget", s.lifeBudget || "");
 
   var hasData = a.tl || ST.incomes.length || ST.expenses.length || ST.bills.length;
   $("panelIntro").style.display = hasData ? "none" : "block";
@@ -495,7 +576,7 @@ function bindFlow() {
   $("impFile").addEventListener("change", restore);
 }
 function renderFlow() {
-  $("hhSize").value = ST.settings.hhSize || 1;
+  setVal("hhSize", ST.settings.hhSize || 1);
   $("incomeTotal").textContent = fmtTL(incomeTotal());
   $("incomeList").innerHTML = ST.incomes.length ? ST.incomes.map(function (i) {
     return '<div class="item"><div class="top"><span class="nm">' + esc(i.name) + '</span><span class="pr green">' +
@@ -618,7 +699,7 @@ function renderBills() {
 }
 function renderKK() {
   var c = PB_DATA.creditCard;
-  $("kkDebt").value = ST.kk.debt || ""; $("kkAsgari").value = ST.kk.asgari || ""; $("kkPay").value = ST.kk.pay || "";
+  setVal("kkDebt", ST.kk.debt || ""); setVal("kkAsgari", ST.kk.asgari || ""); setVal("kkPay", ST.kk.pay || "");
   $("kkSrc").textContent = "Oranlar: " + c.source + " (" + c.asOf + " itibarıyla, aylık akdi " +
     c.tiers.map(function (t) { return "%" + fmt2(t.akdi).replace(",00", "") + " (" + t.label + ")"; }).join(" · ") +
     "). Faize KKDF+BSMV (%" + (c.kkdf + c.bsmv) + ") eklenir. " + c.note;
@@ -819,7 +900,7 @@ function remainStr(t) {
   return (g > 0 ? g + "g " : "") + s + "s " + dk + "dk kaldı";
 }
 function renderPlan() {
-  $("efNow").value = ST.settings.efNow || "";
+  setVal("efNow", ST.settings.efNow || "");
   var inc = incomeTotal(), oblig = billsMonthly() + instMonthly(), life = ST.settings.lifeBudget || 0;
   var investable = inc - oblig - life;
   var steps = [
@@ -973,7 +1054,9 @@ function aiContext() {
     .map(function (k) { return k + " " + Math.round(cm[k]) + "₺"; }).join(", ");
   var billsOpen = ST.bills.filter(function (b) { return billStatus(b).cls !== "b-paid"; });
   var last = ST.scores.length ? ST.scores[ST.scores.length - 1].score : null;
-  return "Aylık gelir: " + (incomeTotal() || "girilmemiş") + "₺. Baktığı kişi sayısı: " + (ST.settings.hhSize || 1) +
+  var g = ST.settings.goal;
+  return "Hedef para: " + (g && g.amount ? (g.name || "hedef") + " " + g.amount + "₺" + (g.date ? " (" + g.date + " hedefli)" : "") : "belirlenmemiş") +
+    ". Aylık gelir: " + (incomeTotal() || "girilmemiş") + "₺. Baktığı kişi sayısı: " + (ST.settings.hhSize || 1) +
     ". Varlıklar: " + Math.round(assetsTL()) + "₺ (TL " + ST.assets.tl + ", USD " + ST.assets.usd + ", EUR " + ST.assets.eur +
     ", altın " + ST.assets.au + " gr). Aylık yaşam bütçesi: " + (ST.settings.lifeBudget || "girilmemiş") +
     "₺. Bu ay harcanan: " + Math.round(monthSpent()) + "₺. Kategoriler: " + (cats || "yok") +
