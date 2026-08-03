@@ -94,14 +94,31 @@ Bilinmeyen değerler `null` bırakılır ve arayüzde `—` görünür.
 
 ### Canlı piyasa verisi
 
-Hepsi ücretsiz ve anahtarsızdır.
+Hepsi ücretsiz ve anahtarsızdır. Kaynaklar **sırayla** denenir: ilk kaynak hangi alanları
+verirse onlar alınır, eksik kalanlar için sıradaki kaynağa geçilir. Bir kaynağın düşmesi
+diğerlerini etkilemez.
 
-| Veri | Kaynak | Tarayıcıdan doğrudan? |
-|---|---|---|
-| USD/TRY, EUR/TRY | open.er-api.com → frankfurter.app (ECB) | ✅ CORS açık |
-| Ons altın (XAU), ons gümüş (XAG) | gold-api.com | ✅ CORS açık |
-| Gram altın / gram gümüş (₺) | ons × USD/TRY ÷ 31,1035 ile hesaplanır | ✅ türetilir |
-| BIST 100 | Yahoo Finance / Stooq | ❌ **proxy gerekir** |
+| Sıra | Kaynak | Verdiği | Tarayıcıdan doğrudan? |
+|---|---|---|---|
+| 0 | Worker proxy (varsa) | hepsi + BIST 100 | ✅ |
+| 1 | currency-api (jsDelivr) | USD/TRY, EUR/TRY, ons altın, ons gümüş — **tek istekte** | ✅ CORS açık |
+| 2 | currency-api (pages.dev yedeği) | aynısı | ✅ CORS açık |
+| 3 | open.er-api.com | USD/TRY, EUR/TRY | ✅ CORS açık |
+| 4 | frankfurter.app (ECB) | USD/TRY, EUR/TRY | ✅ CORS açık |
+| 5 | gold-api.com | ons altın, ons gümüş | ✅ CORS açık |
+| — | Yahoo Finance / Stooq | BIST 100 | ❌ **proxy gerekir** |
+
+Gram fiyatları `ons × USD/TRY ÷ 31,1035` ile türetilir. **Kur çekilemezse gram fiyatı
+hesaplanmaz** — eski ya da varsayılan bir kurla çarpmak yerine `—` gösterilir.
+
+Yanıt şekilleri toleranslı okunur (alan adı büyük/küçük harf farkı, alternatif anahtar
+yolları). Beklenen alan yoksa kaynak sessizce düşer ve sıradaki denenir.
+
+### Kaynaklar çalışıyor mu?
+
+**Ayarlar → Canlı piyasa verisi → “Kaynakları test et”** her kaynağı tek tek dener ve
+hangisinin çalıştığını, ne döndürdüğünü, düşenlerin neden düştüğünü tablo hâlinde gösterir.
+Uzak servisler zamanla değişebildiği için tanılama uygulamanın içine gömülüdür.
 
 BIST 100 için araya bir sunucu girmesi gerekiyor: Yahoo Finance, Stooq ve TCMB tarayıcıdan
 gelen isteklere CORS başlığı döndürmez. Hazır Worker kodu depoda:

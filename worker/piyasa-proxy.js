@@ -72,27 +72,41 @@ export async function piyasaCevapla(request) {
   const kaynaklar = {};
   const hatalar = [];
 
-  const [kur, ons, gumus, bist] = await Promise.all([
-    guvenli(kurCek, hatalar, 'kur'),
-    guvenli(onsAltinCek, hatalar, 'altin'),
-    guvenli(onsGumusCek, hatalar, 'gumus'),
+  // currency-api tek istekte kur + iki madeni birden verir; upstream yükünü azaltır.
+  const [hepsi, bist] = await Promise.all([
+    guvenli(currencyApiCek, hatalar, 'currency-api'),
     guvenli(bistCek, hatalar, 'bist')
   ]);
 
-  let usd = null, eur = null;
-  if (kur) { usd = kur.usd; eur = kur.eur; kaynaklar.usd = kur.kaynak; kaynaklar.eur = kur.kaynak; }
+  let usd = hepsi?.usd ?? null;
+  let eur = hepsi?.eur ?? null;
+  let onsAltin = hepsi?.onsAltin ?? null;
+  let onsGumus = hepsi?.onsGumus ?? null;
+  if (hepsi) {
+    if (usd) { kaynaklar.usd = hepsi.kaynak; kaynaklar.eur = hepsi.kaynak; }
+    if (onsAltin) kaynaklar.onsAltin = hepsi.kaynak;
+    if (onsGumus) kaynaklar.onsGumus = hepsi.kaynak;
+  }
 
-  let onsAltin = null;
-  if (ons) { onsAltin = ons.deger; kaynaklar.onsAltin = ons.kaynak; }
+  // eksik kalanlar için yedek kaynaklar
+  if (!usd) {
+    const kur = await guvenli(kurCek, hatalar, 'kur');
+    if (kur) { usd = kur.usd; eur = kur.eur; kaynaklar.usd = kur.kaynak; kaynaklar.eur = kur.kaynak; }
+  }
+  if (!onsAltin) {
+    const ons = await guvenli(onsAltinCek, hatalar, 'altin');
+    if (ons) { onsAltin = ons.deger; kaynaklar.onsAltin = ons.kaynak; }
+  }
+  if (!onsGumus) {
+    const g = await guvenli(onsGumusCek, hatalar, 'gumus');
+    if (g) { onsGumus = g.deger; kaynaklar.onsGumus = g.kaynak; }
+  }
 
   let gramAltin = null;
   if (onsAltin && usd) {
     gramAltin = onsAltin * usd / GRAM_ONS;
     kaynaklar.gramAltin = 'hesaplandı (ons × USD/TRY ÷ 31,1035)';
   }
-
-  let onsGumus = null;
-  if (gumus) { onsGumus = gumus.deger; kaynaklar.onsGumus = gumus.kaynak; }
 
   let gramGumus = null;
   if (onsGumus && usd) {
@@ -128,6 +142,42 @@ async function json(url, secenek = {}) {
   });
   if (!c.ok) throw new Error('HTTP ' + c.status);
   return c.json();
+}
+
+/**
+ * currency-api — tek istekte USD/TRY, EUR/TRY, ons altın ve ons gümüş.
+ * Yanıt: { date, usd: { try: 47.8, eur: 0.92, xau: 0.00024, xag: 0.019 } }
+ */
+async function currencyApiCek() {
+  const adresler = [
+    'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json',
+    'https://latest.currency-api.pages.dev/v1/currencies/usd.json'
+  ];
+  let son;
+  for (const url of adresler) {
+    try {
+      const d = await json(url);
+      const k = d && (d.usd || d.USD);
+      if (!k) throw new Error('beklenen "usd" alanı yok');
+      const oku = ad => {
+        const v = Number(k[ad] ?? k[ad.toUpperCase()]);
+        return Number.isFinite(v) && v > 0 ? v : null;
+      };
+      const usd = oku('try');
+      const eurOran = oku('eur');
+      const xau = oku('xau');
+      const xag = oku('xag');
+      if (!usd && !xau && !xag) throw new Error('okunabilir değer yok');
+      return {
+        usd,
+        eur: usd && eurOran ? usd / eurOran : null,
+        onsAltin: xau ? 1 / xau : null,
+        onsGumus: xag ? 1 / xag : null,
+        kaynak: 'currency-api'
+      };
+    } catch (e) { son = e; }
+  }
+  throw son || new Error('currency-api ulaşılamadı');
 }
 
 /** USD/TRY ve EUR/TRY. Birinci kaynak düşerse ikinciye geçer. */

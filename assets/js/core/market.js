@@ -110,14 +110,106 @@ function num(v) {
   return Number.isFinite(x) ? x : null;
 }
 
-/* ---------- kaynaklar ---------- */
+/* ---------- kaynaklar ----------
+   Her kaynak bir nesne döndürür: { alanAdı: deger(...) }
+   Hepsi ücretsiz, anahtarsız ve CORS açıktır.
+   Yanıt şekilleri zamanla değişebildiği için okuma toleranslı yapılır:
+   beklenen alan yoksa kaynak sessizce düşer, sıradaki denenir.
+--------------------------------- */
 
-/** 1) Kullanıcının Worker proxy'si — tek istekte hepsi. */
+/** Nesnenin içinden, verilen yollardan ilk bulunan pozitif sayıyı çeker. */
+function sayiBul(nesne, yollar) {
+  for (const yol of yollar) {
+    let v = nesne;
+    for (const parca of yol.split('.')) {
+      if (v === null || typeof v !== 'object') { v = undefined; break; }
+      // anahtarı büyük/küçük harf duyarsız ara
+      if (parca in v) { v = v[parca]; continue; }
+      const k = Object.keys(v).find(x => x.toLowerCase() === parca.toLowerCase());
+      v = k === undefined ? undefined : v[k];
+    }
+    const n = num(v);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  return null;
+}
+
+/**
+ * 1) currency-api — tek istekte hem kur hem kıymetli maden verir.
+ *    Yanıt: { date, usd: { try: 47.8, eur: 0.92, xau: 0.00024, xag: 0.019, ... } }
+ *    Ons fiyatı = 1 / (usd→xau oranı).
+ */
+function currencyApi(url, ad) {
+  return async () => {
+    const d = await getir(url, 9000);
+    const kok = d && (d.usd || d.USD);
+    if (!kok || typeof kok !== 'object') throw new Error('beklenen "usd" alanı yok');
+
+    const z = Date.now();
+    const out = {};
+    const usd = sayiBul(kok, ['try']);
+    if (usd) out.usd = deger(usd, ad, 'canli', z);
+
+    const eurOran = sayiBul(kok, ['eur']);
+    if (usd && eurOran) out.eur = deger(usd / eurOran, ad, 'canli', z);
+
+    const xau = sayiBul(kok, ['xau']);
+    if (xau) out.onsAltin = deger(1 / xau, ad, 'canli', z);
+
+    const xag = sayiBul(kok, ['xag']);
+    if (xag) out.onsGumus = deger(1 / xag, ad, 'canli', z);
+
+    if (!Object.keys(out).length) throw new Error('okunabilir değer yok');
+    return out;
+  };
+}
+
+/** 2) exchangerate-api açık uç noktası. */
+async function kaynakErApi() {
+  const d = await getir('https://open.er-api.com/v6/latest/USD');
+  const usd = sayiBul(d, ['rates.TRY', 'conversion_rates.TRY', 'data.TRY']);
+  if (!usd) throw new Error('TRY kuru yok');
+  const z = Date.now();
+  const out = { usd: deger(usd, 'open.er-api.com', 'canli', z) };
+  const e = sayiBul(d, ['rates.EUR', 'conversion_rates.EUR', 'data.EUR']);
+  if (e) out.eur = deger(usd / e, 'open.er-api.com', 'canli', z);
+  return out;
+}
+
+/** 3) Frankfurter — ECB verisi, hafta içi güncellenir. */
+async function kaynakFrankfurter() {
+  const d = await getir('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR');
+  const usd = sayiBul(d, ['rates.TRY']);
+  if (!usd) throw new Error('TRY kuru yok');
+  const z = Date.now();
+  const out = { usd: deger(usd, 'frankfurter.app (ECB)', 'canli', z) };
+  const e = sayiBul(d, ['rates.EUR']);
+  if (e) out.eur = deger(usd / e, 'frankfurter.app (ECB)', 'canli', z);
+  return out;
+}
+
+/** 4) gold-api — ons altın ve ons gümüş, ayrı isteklerle. */
+async function kaynakGoldApi() {
+  const out = {};
+  const cift = [['XAU', 'onsAltin'], ['XAG', 'onsGumus']];
+  const sonuclar = await Promise.allSettled(
+    cift.map(([sembol]) => getir('https://api.gold-api.com/price/' + sembol, 9000))
+  );
+  sonuclar.forEach((s, i) => {
+    if (s.status !== 'fulfilled') return;
+    const p = sayiBul(s.value, ['price', 'Price', 'rate', 'value']);
+    if (p) out[cift[i][1]] = deger(p, 'gold-api.com', 'canli', Date.now());
+  });
+  if (!Object.keys(out).length) throw new Error('okunabilir fiyat yok');
+  return out;
+}
+
+/** 0) Kullanıcının Worker proxy'si — tek istekte hepsi (BIST dahil). */
 async function kaynakProxy() {
   const url = (durum.piyasa.proxyUrl || '').trim();
-  if (!url) return null;
+  if (!url) throw new Error('proxy adresi tanımlı değil');
   const ayrac = url.includes('?') ? '&' : '?';
-  const d = await getir(url + ayrac + 'action=piyasa', 10000);
+  const d = await getir(url + ayrac + 'action=piyasa', 11000);
   if (!d || typeof d !== 'object' || d.error) {
     throw new Error(d && d.error ? String(d.error) : 'proxy yanıtı geçersiz');
   }
@@ -126,51 +218,53 @@ async function kaynakProxy() {
   const out = {};
   ALANLAR.forEach(a => {
     const v = num(d[a]);
-    if (v !== null) out[a] = deger(v, k[a] || 'proxy', 'canli', z);
+    if (v !== null && v > 0) out[a] = deger(v, k[a] || 'proxy', 'canli', z);
   });
+  if (!Object.keys(out).length) throw new Error('proxy hiçbir değer döndürmedi');
   return out;
 }
 
-/** 2a) exchangerate-api açık uç noktası — anahtarsız, CORS açık, günlük güncellenir. */
-async function kaynakErApi() {
-  const d = await getir('https://open.er-api.com/v6/latest/USD');
-  if (!d || d.result !== 'success' || !d.rates || !d.rates.TRY) throw new Error('er-api yanıtı geçersiz');
-  const z = Date.now();
-  const usd = num(d.rates.TRY);
-  const eur = d.rates.EUR ? usd / num(d.rates.EUR) : null;
-  return {
-    usd: deger(usd, 'open.er-api.com', 'canli', z),
-    eur: deger(eur, 'open.er-api.com', 'canli', z)
-  };
-}
+/**
+ * Kaynak listesi — sırayla denenir. Bir kaynak yalnızca hâlâ eksik olan
+ * alanlar için çağrılır; hepsi doluysa ağa hiç çıkılmaz.
+ */
+const KAYNAKLAR = [
+  { id: 'proxy',        ad: 'Worker proxy',            verir: ALANLAR,                                  cek: kaynakProxy },
+  { id: 'currency-api', ad: 'currency-api (jsDelivr)', verir: ['usd', 'eur', 'onsAltin', 'onsGumus'],
+    cek: currencyApi('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json', 'currency-api (jsDelivr)') },
+  { id: 'currency-api-2', ad: 'currency-api (yedek)',  verir: ['usd', 'eur', 'onsAltin', 'onsGumus'],
+    cek: currencyApi('https://latest.currency-api.pages.dev/v1/currencies/usd.json', 'currency-api (yedek)') },
+  { id: 'er-api',       ad: 'open.er-api.com',         verir: ['usd', 'eur'],                           cek: kaynakErApi },
+  { id: 'frankfurter',  ad: 'frankfurter.app (ECB)',   verir: ['usd', 'eur'],                           cek: kaynakFrankfurter },
+  { id: 'gold-api',     ad: 'gold-api.com',            verir: ['onsAltin', 'onsGumus'],                 cek: kaynakGoldApi }
+];
 
-/** 2b) Frankfurter (ECB verisi) — anahtarsız, CORS açık. Hafta içi güncellenir. */
-async function kaynakFrankfurter() {
-  const d = await getir('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR');
-  if (!d || !d.rates || !d.rates.TRY) throw new Error('frankfurter yanıtı geçersiz');
-  const z = Date.now();
-  const usd = num(d.rates.TRY);
-  const eur = d.rates.EUR ? usd / num(d.rates.EUR) : null;
-  return {
-    usd: deger(usd, 'frankfurter.app (ECB)', 'canli', z),
-    eur: deger(eur, 'frankfurter.app (ECB)', 'canli', z)
-  };
-}
-
-/** 2c) Ons altın ve ons gümüş (USD) — anahtarsız. */
-async function kaynakKiymetliMaden() {
-  const out = {};
-  const cift = [['XAU', 'onsAltin'], ['XAG', 'onsGumus']];
-  const sonuclar = await Promise.allSettled(
-    cift.map(([sembol]) => getir('https://api.gold-api.com/price/' + sembol))
-  );
-  sonuclar.forEach((s, i) => {
-    if (s.status !== 'fulfilled') return;
-    const p = num(s.value && (s.value.price ?? s.value.Price));
-    if (p !== null && p > 0) out[cift[i][1]] = deger(p, 'gold-api.com', 'canli', Date.now());
-  });
-  if (!Object.keys(out).length) throw new Error('kıymetli maden yanıtı geçersiz');
-  return out;
+/**
+ * Her kaynağı tek tek dener ve sonucu bildirir — tanılama içindir.
+ * Hangi kaynak çalışıyor, hangisi neden düşüyor, kullanıcı kendi cihazında görür.
+ */
+export async function kaynakTesti() {
+  const sonuc = [];
+  for (const k of KAYNAKLAR) {
+    if (k.id === 'proxy' && !(durum.piyasa.proxyUrl || '').trim()) {
+      sonuc.push({ id: k.id, ad: k.ad, durum: 'atlandi', not: 'Worker adresi girilmemiş' });
+      continue;
+    }
+    const bas = Date.now();
+    try {
+      const r = await k.cek();
+      const alanlar = Object.entries(r)
+        .filter(([, v]) => v && v.deger !== null)
+        .map(([a, v]) => ({ alan: a, deger: v.deger }));
+      sonuc.push({
+        id: k.id, ad: k.ad, durum: alanlar.length ? 'calisiyor' : 'bos',
+        sure: Date.now() - bas, alanlar
+      });
+    } catch (e) {
+      sonuc.push({ id: k.id, ad: k.ad, durum: 'hata', sure: Date.now() - bas, not: e && e.message ? e.message : 'bilinmeyen hata' });
+    }
+  }
+  return sonuc;
 }
 
 /* ---------- ana çekim ---------- */
@@ -210,24 +304,20 @@ export async function piyasayiCek({ zorla = false } = {}) {
   yayinla('piyasa', piyasa);
 
   const toplanan = {};
-  const dene = async (ad, fn) => {
+  const eksikVar = k => k.verir.some(a => !toplanan[a]);
+
+  for (const kaynak of KAYNAKLAR) {
+    if (!eksikVar(kaynak)) continue;                       // bu kaynağın verdiği her şey zaten var
+    if (kaynak.id === 'proxy' && !(durum.piyasa.proxyUrl || '').trim()) continue;
     try {
-      const r = await fn();
-      if (r) for (const [k, v] of Object.entries(r)) {
-        if (v && v.deger !== null && !toplanan[k]) toplanan[k] = v;
+      const r = await kaynak.cek();
+      for (const [alan, v] of Object.entries(r || {})) {
+        if (v && v.deger !== null && !toplanan[alan]) toplanan[alan] = v;
       }
     } catch (e) {
-      piyasa.hatalar.push(ad + ': ' + (e && e.message ? e.message : 'hata'));
+      piyasa.hatalar.push(kaynak.ad + ': ' + (e && e.message ? e.message : 'hata'));
     }
-  };
-
-  // proxy her şeyi verebilir; önce o
-  await dene('proxy', kaynakProxy);
-
-  // eksikler için doğrudan kaynaklar
-  if (!toplanan.usd) await dene('er-api', kaynakErApi);
-  if (!toplanan.usd) await dene('frankfurter', kaynakFrankfurter);
-  if (!toplanan.onsAltin || !toplanan.onsGumus) await dene('gold-api', kaynakKiymetliMaden);
+  }
 
   piyasa.cekiliyor = false;
   piyasa.sonDeneme = Date.now();
