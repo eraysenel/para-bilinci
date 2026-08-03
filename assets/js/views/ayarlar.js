@@ -2,7 +2,7 @@
 
 import { durum, kaydet, yedekAl, yedekYukle, hepsiniSil, eskiVeriVar, eskiVeriSil, durumuDegistir } from '../core/store.js';
 import * as Kilit from '../core/kilit.js';
-import { piyasa, piyasayiCek, elleGir, proxyKaydet, gecmisOku, frenOzeti, frenDurumu } from '../core/market.js';
+import { piyasa, piyasayiCek, elleGir, proxyKaydet, gecmisOku, frenOzeti, frenDurumu, kaynakTesti } from '../core/market.js';
 import * as H from '../core/hesap.js';
 import { tl, n, yuzde, tarihUzun, bugun, goreliZaman, kac, sayiOku } from '../core/fmt.js';
 import { dosem, kart, bos, notKutu, rozet, kaynakEtiketi, eylemKaydet, bildir, modalAc, formOku, onayla, alan, girdi, secim } from '../core/ui.js';
@@ -108,8 +108,10 @@ function piyasaKart() {
     <div class="dg-grup ust-12">
       <button class="dg-btn b-ana b-kucuk" data-eylem="piyasa-yenile" ${piyasa.cekiliyor ? 'disabled' : ''}>
         ${piyasa.cekiliyor ? 'çekiliyor…' : '⟳ Şimdi yenile'}</button>
+      <button class="dg-btn b-cizgi b-kucuk" data-eylem="kaynak-test">⚗ Kaynakları test et</button>
       ${piyasa.hatalar.length ? `<button class="dg-btn b-sade b-kucuk" data-eylem="piyasa-hata">Hataları gör (${piyasa.hatalar.length})</button>` : ''}
     </div>
+    <div id="kaynakSonuc"></div>
 
     <div class="mini r-faint ust-8">
       Gram fiyatları ons × USD/TRY ÷ 31,1035 ile hesaplanır.
@@ -460,4 +462,67 @@ eylemKaydet('kilit-kaldir', () => {
       }
     ]
   });
+});
+
+/* ---------- kaynak tanılama ---------- */
+
+eylemKaydet('kaynak-test', async (_v, _e, oge) => {
+  const kap = document.getElementById('kaynakSonuc');
+  if (!kap) return;
+
+  const f = frenDurumu(true);
+  if (!f.izin) {
+    kap.innerHTML = `<div class="ust-12">${notKutu('bilgi',
+      f.sebep === 'gunluk-limit'
+        ? `Günlük istek sınırına ulaşıldı. Kaynakları yormamak için yarın sıfırlanacak.`
+        : `Çok sık deneme. ${f.kalanSaniye} saniye sonra tekrar dene.`)}</div>`;
+    return;
+  }
+
+  oge.disabled = true;
+  const eskiMetin = oge.textContent;
+  oge.textContent = 'test ediliyor…';
+  kap.innerHTML = `<div class="mini r-muted ust-12">Her kaynak tek tek deneniyor…</div>`;
+
+  let sonuc;
+  try { sonuc = await kaynakTesti(); }
+  catch (e) { sonuc = []; }
+
+  oge.disabled = false;
+  oge.textContent = eskiMetin;
+
+  const ad = { usd: 'USD/TRY', eur: 'EUR/TRY', onsAltin: 'Ons altın', onsGumus: 'Ons gümüş',
+               gramAltin: 'Gram altın', gramGumus: 'Gram gümüş', bist: 'BIST 100' };
+  const calisan = sonuc.filter(x => x.durum === 'calisiyor');
+
+  kap.innerHTML = `
+    <div class="ust-12">
+      <div class="tablo-sar"><table class="veri">
+        <thead><tr><th>Kaynak</th><th>Durum</th><th>Döndürdüğü</th><th class="num">Süre</th></tr></thead>
+        <tbody>${sonuc.map(x => `
+          <tr>
+            <td class="kalin" style="font-size:12.5px">${kac(x.ad)}</td>
+            <td>${x.durum === 'calisiyor' ? rozet('çalışıyor', 'em')
+                : x.durum === 'hata' ? rozet('ulaşılamadı', 'red')
+                : x.durum === 'bos' ? rozet('boş yanıt', 'amber')
+                : rozet('atlandı', 'notr')}</td>
+            <td class="mini">${x.alanlar && x.alanlar.length
+                ? x.alanlar.map(a => `${kac(ad[a.alan] || a.alan)} <b>${n(a.deger, 2)}</b>`).join(' · ')
+                : `<span class="r-faint">${kac(x.not || '—')}</span>`}</td>
+            <td class="num mini r-faint">${x.sure !== undefined ? x.sure + ' ms' : '—'}</td>
+          </tr>`).join('')}
+        </tbody></table></div>
+
+      <div class="ust-12">${notKutu(calisan.length ? 'iyi' : 'kotu',
+        calisan.length
+          ? `<b>${calisan.length} kaynak çalışıyor.</b> Uygulama bunları sırayla kullanır: ilk kaynak
+             hangi alanları verirse onlar alınır, eksik kalanlar için sıradaki kaynak denenir.
+             Bir kaynağın düşmesi diğerlerini etkilemez.`
+          : `<b>Hiçbir kaynağa ulaşılamadı.</b> İnternet bağlantını kontrol et.
+             Sorun sürerse değerleri yukarıdaki kutulardan elle girebilirsin —
+             uygulamanın geri kalanı elle girilen değerlerle de tam çalışır.`)}</div>
+
+      ${sonuc.some(x => x.id === 'proxy' && x.durum === 'atlandi')
+        ? `<div class="mini r-faint ust-8">BIST 100 yalnızca Worker proxy üzerinden gelir; adres girilmediği için o kaynak atlandı.</div>` : ''}
+    </div>`;
 });
