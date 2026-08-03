@@ -89,9 +89,34 @@
     ]
   },
 
-  "altin": {
+  "kiymetliMaden": {
     "gramOns": 31.1034768,
-    "milyemAyar": { "24": 1.0, "22": 0.916, "18": 0.750, "14": 0.585 },
-    "not": "Gram altın (TL) = ONS altın (USD) × USD/TRY ÷ 31,1034768. Uygulama bu formülü kullanır."
+    "not": "Gram fiyatı (TL) = ons fiyatı (USD) × USD/TRY ÷ 31,1034768. Uygulama hem altın hem gümüş için bu formülü kullanır.",
+    "altin": {
+      "milyemAyar": { "24": 1.0, "22": 0.916, "18": 0.750, "14": 0.585 },
+      "sembol": "XAU"
+    },
+    "gumus": {
+      "milyemAyar": { "999": 0.999, "925": 0.925, "900": 0.900, "800": 0.800 },
+      "sembol": "XAG",
+      "not": "Gümüş altından çok daha oynaktır ve sanayi talebine duyarlıdır; kısa vadede altına göre daha sert dalgalanır."
+    }
+  },
+
+  "veriKaynaklari": {
+    "not": "Uygulamanın kullandığı tüm canlı veri kaynakları ücretsiz ve API anahtarı gerektirmez. Sitede ücretli hiçbir servis çağrılmaz, reklam ve takip kodu yoktur.",
+    "canli": [
+      { "ad": "open.er-api.com",  "veri": "USD/TRY, EUR/TRY", "ucretsiz": true, "anahtarsiz": true, "cors": true },
+      { "ad": "frankfurter.app",  "veri": "USD/TRY, EUR/TRY (ECB) — yedek", "ucretsiz": true, "anahtarsiz": true, "cors": true },
+      { "ad": "gold-api.com",     "veri": "Ons altın (XAU), ons gümüş (XAG)", "ucretsiz": true, "anahtarsiz": true, "cors": true },
+      { "ad": "Yahoo Finance / Stooq", "veri": "BIST 100 — yalnızca kendi Worker proxy'n üzerinden", "ucretsiz": true, "anahtarsiz": true, "cors": false }
+    ],
+    "istekFreni": {
+      "not": "Ücretsiz kaynakları yormamak için tarayıcı tarafında uygulanan sınırlar.",
+      "onbellekDakika": 30,
+      "enKisaAralikDakika": 10,
+      "elleYenilemeSaniye": 60,
+      "gunlukIstekLimiti": 24
+    }
   }
 }

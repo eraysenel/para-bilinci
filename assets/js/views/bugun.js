@@ -44,6 +44,7 @@ function piyasaSeridi() {
     ${kutu('USD/TRY', piyasa.usd, v => n(v, 2))}
     ${kutu('EUR/TRY', piyasa.eur, v => n(v, 2))}
     ${kutu('Gram altın', piyasa.gramAltin, v => n(v) + ' ₺')}
+    ${kutu('Gram gümüş', piyasa.gramGumus, v => n(v, 2) + ' ₺')}
     ${kutu('BIST 100', piyasa.bist, v => n(v), 'proxy gerekir')}
     <div class="serit-kutu" style="display:flex;align-items:center;justify-content:center;min-width:118px">
       <button class="dg-btn b-sade b-kucuk" data-eylem="piyasa-yenile" ${piyasa.cekiliyor ? 'disabled' : ''}>
@@ -234,11 +235,18 @@ function erimeKart() {
           ${dosem({ etiket: 'Elindeki nakit', deger: tl(nakit), ikon: '◉' })}
           ${dosem({ etiket: 'Dolar karşılığı', deger: '$' + n(nakit / piyasa.usd.deger), ipucu: `kur ${n(piyasa.usd.deger, 2)}`, renk: 'r-blue', ikon: '$' })}
         </div>
-        ${piyasa.gramAltin.deger ? `<div class="ust-12">${dosem({
-          etiket: 'Gram altın karşılığı',
-          deger: n(nakit / piyasa.gramAltin.deger, 2) + ' gr',
-          ipucu: `gram ${n(piyasa.gramAltin.deger)} ₺`, renk: 'r-gold', ikon: '◆'
-        })}</div>` : ''}` : ''}
+        ${piyasa.gramAltin.deger || piyasa.gramGumus.deger ? `<div class="izgara iz-2 ust-12">
+          ${piyasa.gramAltin.deger ? dosem({
+            etiket: 'Gram altın karşılığı',
+            deger: n(nakit / piyasa.gramAltin.deger, 2) + ' gr',
+            ipucu: `gram ${n(piyasa.gramAltin.deger)} ₺`, renk: 'r-gold', ikon: '◆'
+          }) : ''}
+          ${piyasa.gramGumus.deger ? dosem({
+            etiket: 'Gram gümüş karşılığı',
+            deger: n(nakit / piyasa.gramGumus.deger, 1) + ' gr',
+            ipucu: `gram ${n(piyasa.gramGumus.deger, 2)} ₺`, renk: 'r-muted', ikon: '◇'
+          }) : ''}
+        </div>` : ''}` : ''}
     `, { ikon: '◇' });
   }
 

@@ -76,6 +76,7 @@ function onizleme(fiyat) {
   if (e.gelirYuzdesi !== null) kalemler.push({ et: 'Aylık gelirinin', dg: yuzde(e.gelirYuzdesi, 1), renk: 'r-blue' });
   if (e.gunKarsiligi !== null) kalemler.push({ et: 'Günlük payının', dg: n(e.gunKarsiligi, 1) + ' günü', renk: 'r-violet' });
   if (gram) kalemler.push({ et: 'Gram altın', dg: n(gram, 2) + ' gr', renk: 'r-gold' });
+  else if (piyasa.gramGumus.deger) kalemler.push({ et: 'Gram gümüş', dg: n(fiyat / piyasa.gramGumus.deger, 1) + ' gr', renk: 'r-muted' });
   else if (usd) kalemler.push({ et: 'Dolar', dg: '$' + n(usd), renk: 'r-teal' });
 
   if (!kalemler.length) return '';

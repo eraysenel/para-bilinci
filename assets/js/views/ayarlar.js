@@ -1,7 +1,7 @@
 /* Ayarlar — tema, piyasa kaynağı, yedek, veri yönetimi. */
 
 import { durum, kaydet, yedekAl, yedekYukle, hepsiniSil, eskiVeriVar, eskiVeriSil } from '../core/store.js';
-import { piyasa, piyasayiCek, elleGir, proxyKaydet, gecmisOku } from '../core/market.js';
+import { piyasa, piyasayiCek, elleGir, proxyKaydet, gecmisOku, frenOzeti, frenDurumu } from '../core/market.js';
 import * as H from '../core/hesap.js';
 import { tl, n, yuzde, tarihUzun, bugun, goreliZaman, kac, sayiOku } from '../core/fmt.js';
 import { dosem, kart, bos, notKutu, rozet, kaynakEtiketi, eylemKaydet, bildir, modalAc, formOku, onayla, alan, girdi, secim } from '../core/ui.js';
@@ -38,17 +38,28 @@ function piyasaKart() {
     </div>`;
   };
 
+  const f = frenOzeti();
+
   return kart('Canlı piyasa verisi', `
     ${satir('usd', 'USD / TRY', 'çekilemedi')}
     ${satir('eur', 'EUR / TRY', 'çekilemedi')}
     ${satir('onsAltin', 'Ons altın (USD)', 'çekilemedi')}
     ${satir('gramAltin', 'Gram altın (₺)', 'ons ve kur gerekir')}
+    ${satir('onsGumus', 'Ons gümüş (USD)', 'çekilemedi')}
+    ${satir('gramGumus', 'Gram gümüş (₺)', 'ons ve kur gerekir')}
     ${satir('bist', 'BIST 100', 'tarayıcıdan çekilemez — proxy gerekir')}
 
     <div class="dg-grup ust-12">
       <button class="dg-btn b-ana b-kucuk" data-eylem="piyasa-yenile" ${piyasa.cekiliyor ? 'disabled' : ''}>
         ${piyasa.cekiliyor ? 'çekiliyor…' : '⟳ Şimdi yenile'}</button>
       ${piyasa.hatalar.length ? `<button class="dg-btn b-sade b-kucuk" data-eylem="piyasa-hata">Hataları gör (${piyasa.hatalar.length})</button>` : ''}
+    </div>
+
+    <div class="mini r-faint ust-8">
+      Gram fiyatları ons × USD/TRY ÷ 31,1035 ile hesaplanır.
+      Kaynakları yormamak için veri ${f.onbellekOmruDk} dk önbellekte tutulur, denemeler arasında
+      en az ${f.enKisaAralikDk} dk beklenir, günde en fazla ${f.gunlukLimit} istek yapılır
+      (bugün ${f.kullanilan} kullanıldı${f.onbellekYasiDk !== null ? `, önbellek ${f.onbellekYasiDk} dk önce tazelendi` : ''}).
     </div>
 
     <hr class="ayrac">
@@ -58,19 +69,17 @@ function piyasaKart() {
       ek: 'data-degisti="proxy-degis"'
     }), 'BIST 100 için gerekli')}
 
-    ${notKutu('bilgi', `
-      <b>Neden proxy gerekiyor?</b> Döviz ve ons altın için tarayıcıdan doğrudan çağrılabilen
-      (CORS başlığı gönderen) ücretsiz API'ler var. BIST 100 için yok: Yahoo Finance, Stooq ve TCMB
-      tarayıcıdan gelen isteklere izin vermez. Araya bir sunucu girmesi gerekir.<br><br>
-      Depoda hazır Worker kodu var: <code>worker/piyasa-proxy.js</code>.
-      Mevcut AI danışman Worker'ına ekleyebilir ya da ayrı yayınlayabilirsin; kurulum adımları dosyanın başında yazılı.
-      Adresi buraya yazdığında BIST ve altın oradan çekilir.`)}
-
-    ${notKutu('notr', `
-      <b>Bu araç asla fiyat uydurmaz.</b> Bir değer çekilemezse "—" gösterilir.
-      Elle girdiğin değerler yalnızca canlı veri yokken kullanılır ve
-      <span class="rozet rz-amber">elle girildi</span> etiketiyle işaretlenir.
-      ${gecmis ? `<br><br>Şu ana kadar <b>${gecmis} günlük</b> gerçek fiyat kaydın birikti — Bugün ekranındaki erime grafiği bunu kullanır.` : ''}`)}`,
+    <div class="mini r-faint ust-8" style="line-height:1.65">
+      <b class="r-muted">Neden proxy?</b> Döviz ve kıymetli maden için tarayıcıdan doğrudan çağrılabilen
+      (CORS başlığı gönderen) ücretsiz API'ler var; BIST 100 için yok — Yahoo Finance, Stooq ve TCMB
+      tarayıcıdan gelen isteklere izin vermiyor. Depoda hazır Worker kodu var:
+      <code>worker/piyasa-proxy.js</code>; kurulum adımları dosyanın başında yazılı.
+      Kullandığı kaynakların hepsi ücretsiz ve anahtarsızdır, hiçbir ücretli servis çağrılmaz.
+      <br>
+      <b class="r-muted">Fiyat uydurulmaz.</b> Çekilemeyen değer “—” kalır. Elle girdiğin değerler yalnızca
+      canlı veri yokken kullanılır ve <span class="rozet rz-amber">elle girildi</span> etiketiyle işaretlenir.
+      ${gecmis ? ` Şu ana kadar <b class="r-muted">${gecmis} günlük</b> gerçek fiyat kaydın birikti; Bugün ekranındaki erime grafiği bunu kullanır.` : ''}
+    </div>`,
     { ikon: '◈' });
 }
 
@@ -183,9 +192,19 @@ function hakkindaKart() {
    ============================================================ */
 
 eylemKaydet('piyasa-yenile', async () => {
+  const f = frenDurumu(true);
+  if (!f.izin) {
+    bildir(
+      f.sebep === 'gunluk-limit'
+        ? `Günlük istek sınırına ulaşıldı (${frenOzeti().gunlukLimit}). Kaynakları yormamak için yarın sıfırlanacak — bu arada değerleri elle girebilirsin.`
+        : `Çok sık deneme. ${f.kalanSaniye} saniye sonra tekrar dene.`,
+      'bilgi', 4200);
+    return;
+  }
   bildir('Piyasa verisi çekiliyor…', 'bilgi', 1600);
   await piyasayiCek({ zorla: true });
-  const bulunan = ['usd', 'eur', 'gramAltin', 'bist'].filter(k => piyasa[k].deger !== null && piyasa[k].yontem === 'canli').length;
+  const bulunan = ['usd', 'eur', 'gramAltin', 'gramGumus', 'bist']
+    .filter(k => piyasa[k].deger !== null && piyasa[k].yontem === 'canli').length;
   bildir(bulunan ? `${bulunan} değer güncellendi.` : 'Hiçbir kaynağa ulaşılamadı.', bulunan ? 'iyi' : 'hata');
 });
 

@@ -67,6 +67,7 @@ export const VARLIK_TURLER = [
   { deger: 'usd',   ad: 'Dolar',                 birim: '$' },
   { deger: 'eur',   ad: 'Euro',                  birim: '€' },
   { deger: 'altin', ad: 'Altın (gram)',          birim: 'gr' },
+  { deger: 'gumus', ad: 'Gümüş (gram)',          birim: 'gr' },
   { deger: 'hisse', ad: 'Hisse senedi',          birim: 'adet' },
   { deger: 'fon',   ad: 'Yatırım fonu',          birim: 'pay' },
   { deger: 'diger', ad: 'Diğer',                 birim: 'adet' }

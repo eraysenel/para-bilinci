@@ -1,7 +1,7 @@
 /* Para Bilinci — uygulama kabuğu, yönlendirme ve başlatma. */
 
 import { durum, kaydet, dinle, abone } from './core/store.js';
-import { piyasayiCek, piyasayiHazirla, piyasa } from './core/market.js';
+import { piyasayiCek, piyasayiHazirla, frenOzeti, piyasa } from './core/market.js';
 import * as H from './core/hesap.js';
 import { $, $$, eylemleriBagla, eylemKaydet, bildir, modalAc, formOku, alan, girdi, notKutu, dosem } from './core/ui.js';
 import { kac, sayiOku, bugun, tl } from './core/fmt.js';
@@ -16,13 +16,12 @@ import { yatirimGorunum } from './views/yatirim.js';
 import { mutfakGorunum } from './views/mutfak.js';
 import { skorGorunum } from './views/skor.js';
 import { okulGorunum, mufredatYukle } from './views/okul.js';
-import { mentorGorunum } from './views/mentor.js';
 import { ayarGorunum } from './views/ayarlar.js';
 
 const GORUNUMLER = [
   bugunGorunum, kararGorunum, akisGorunum, faturaGorunum, borcGorunum,
   enflasyonGorunum, yatirimGorunum, mutfakGorunum, skorGorunum,
-  okulGorunum, mentorGorunum, ayarGorunum
+  okulGorunum, ayarGorunum
 ];
 const HARITA = Object.fromEntries(GORUNUMLER.map(g => [g.ad, g]));
 
@@ -30,7 +29,7 @@ const MENU = [
   { baslik: 'Günlük', ogeler: ['bugun', 'kararlar'] },
   { baslik: 'Param', ogeler: ['akis', 'faturalar', 'borc'] },
   { baslik: 'Büyüme', ogeler: ['enflasyon', 'yatirim', 'mutfak', 'skor'] },
-  { baslik: 'Öğren', ogeler: ['okul', 'mentor'] }
+  { baslik: 'Öğren', ogeler: ['okul'] }
 ];
 
 let aktif = 'bugun';
@@ -91,7 +90,7 @@ function menuCiz() {
   }
 
   if (alt) {
-    const sira = ['bugun', 'akis', 'faturalar', 'borc', 'kararlar', 'enflasyon', 'yatirim', 'mutfak', 'skor', 'okul', 'mentor', 'ayarlar'];
+    const sira = ['bugun', 'akis', 'faturalar', 'borc', 'kararlar', 'enflasyon', 'yatirim', 'mutfak', 'skor', 'okul', 'ayarlar'];
     alt.innerHTML = sira.map(ad => {
       const v = HARITA[ad];
       return `<button data-eylem="git" data-hedef="${ad}" class="${ad === aktif ? 'aktif' : ''}">
@@ -115,6 +114,38 @@ function rozetIcin(ad) {
   return '';
 }
 
+/**
+ * Sayfa altındaki kaynak dipnotu. Bilerek küçük ve sessiz: bilgi her zaman
+ * erişilebilir olsun ama ekranı işgal etmesin. Ayrıntı isteyen açar.
+ */
+function kaynakDipnotu() {
+  const r = H.referans();
+  const parcalar = [];
+
+  if (r) {
+    parcalar.push(`Enflasyon: <b>TÜİK</b> ve <b>ENAG</b> ${kac(r.tufe.donemAdi)}`);
+    parcalar.push(`Faiz: <b>TCMB</b> ${kac(r.faiz.krediKarti.yururlukTarihi)}`);
+  }
+  parcalar.push('Kur ve maden: <b>open.er-api.com</b>, <b>frankfurter.app</b>, <b>gold-api.com</b>');
+
+  return `<div class="kaynak-dip">
+    ${parcalar.join('<span class="ayir">·</span>')}
+    <span class="ayir">·</span>
+    <details><summary>kaynaklar ve yöntem</summary>
+      <div class="detay">
+        <div><b>Sayı uydurulmaz.</b> Çekilemeyen değer “—” kalır; projeksiyon içeren hesaplar “senaryo” etiketiyle ve varsayımı yazılarak gösterilir.</div>
+        <div><b>Ücretsiz.</b> Yalnızca anahtar gerektirmeyen açık uç noktalar kullanılır; sitede ücretli hiçbir servis çağrılmaz, reklam ve takip kodu yoktur.</div>
+        <div><b>Kaynakları yormaz.</b> Piyasa verisi ${kac(String(frenOzeti().onbellekOmruDk))} dakika önbellekte tutulur, denemeler arasında en az ${kac(String(frenOzeti().enKisaAralikDk))} dakika beklenir ve günde en fazla ${kac(String(frenOzeti().gunlukLimit))} istek yapılır.</div>
+        <div><b>Veriler cihazında.</b> Hiçbir kayıt sunucuya gönderilmez.</div>
+        ${r ? `<div>Referans veri seti ${kac(r.guncellemeTarihi)} tarihinde güncellendi ·
+          <a href="${kac(r.tufe.kaynakUrl)}" target="_blank" rel="noopener">TÜİK</a>
+          <span class="ayir">·</span><a href="${kac(r.enag.kaynakUrl)}" target="_blank" rel="noopener">ENAG</a>
+          <span class="ayir">·</span><a href="${kac(r.faiz.krediKarti.kaynakUrl)}" target="_blank" rel="noopener">TCMB</a></div>` : ''}
+      </div>
+    </details>
+  </div>`;
+}
+
 function ciz() {
   const g = HARITA[aktif];
   if (!g || !icerikKok) return;
@@ -126,7 +157,8 @@ function ciz() {
         <h1>${g.ikon} ${kac(g.baslik)}</h1>
         ${g.alt ? `<p class="alt">${kac(g.alt)}</p>` : ''}
       </div>
-      ${g.ciz()}`;
+      ${g.ciz()}
+      ${kaynakDipnotu()}`;
   } catch (e) {
     console.error('Görünüm çizilemedi:', e);
     icerikKok.innerHTML = `<div class="kart">${notKutu('kotu',

@@ -2,15 +2,15 @@
    Para Bilinci — piyasa verisi proxy'si (Cloudflare Worker)
 
    NEDEN GEREKLİ?
-   Döviz kuru ve ons altın için tarayıcıdan doğrudan erişilebilen,
+   Döviz kuru, ons altın ve ons gümüş için tarayıcıdan doğrudan erişilebilen,
    CORS başlığı gönderen ücretsiz API'ler var. Ama BIST 100 için yok:
    Yahoo Finance, Stooq ve TCMB tarayıcıdan gelen isteklere CORS başlığı
    döndürmez, dolayısıyla siteden doğrudan çağrılamaz. Araya bir sunucu
    girmesi gerekir. Bu dosya o sunucudur.
 
    NASIL KURULUR?
-   Seçenek A — Mevcut Worker'ına ekle (önerilen):
-     1. Cloudflare panelinde AI danışman Worker'ını aç.
+   Seçenek A — Mevcut bir Worker'ına ekle:
+     1. Cloudflare panelinde Worker'ını aç.
      2. fetch() fonksiyonunun EN BAŞINA şu bloğu ekle:
 
           if (new URL(request.url).searchParams.get('action') === 'piyasa') {
@@ -26,8 +26,10 @@
 
    GÜVENLİK NOTU
    Bu uç nokta yalnızca herkese açık piyasa verisi döndürür; kimlik
-   doğrulaması gerektirmez. Kötüye kullanımı sınırlamak için yanıtlar
-   Cloudflare kenar önbelleğinde 60 saniye tutulur.
+   doğrulaması gerektirmez. Kötüye kullanımı ve upstream rate limit riskini sınırlamak için yanıtlar
+   Cloudflare kenar önbelleğinde 5 dakika tutulur; kaç kullanıcı olursa olsun
+   upstream'e dakikada birden fazla istek gitmez. Kullandığı kaynakların hepsi
+   ücretsiz ve anahtarsızdır — bu Worker hiçbir ücretli servis çağırmaz.
    IZIN_VERILEN_KAYNAKLAR listesini kendi alan adınla sınırlamanı öneririm.
    ============================================================ */
 
@@ -57,7 +59,7 @@ export async function piyasaCevapla(request) {
 
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(origin) });
 
-  // kenar önbelleği: aynı yanıt 60 sn boyunca tekrar üretilmez
+  // kenar önbelleği: aynı yanıt 5 dk boyunca tekrar üretilmez
   const onbellek = caches.default;
   const anahtar = new Request(new URL(request.url).origin + '/__piyasa', { method: 'GET' });
   const kayitli = await onbellek.match(anahtar);
@@ -70,9 +72,10 @@ export async function piyasaCevapla(request) {
   const kaynaklar = {};
   const hatalar = [];
 
-  const [kur, ons, bist] = await Promise.all([
+  const [kur, ons, gumus, bist] = await Promise.all([
     guvenli(kurCek, hatalar, 'kur'),
     guvenli(onsAltinCek, hatalar, 'altin'),
+    guvenli(onsGumusCek, hatalar, 'gumus'),
     guvenli(bistCek, hatalar, 'bist')
   ]);
 
@@ -88,17 +91,26 @@ export async function piyasaCevapla(request) {
     kaynaklar.gramAltin = 'hesaplandı (ons × USD/TRY ÷ 31,1035)';
   }
 
+  let onsGumus = null;
+  if (gumus) { onsGumus = gumus.deger; kaynaklar.onsGumus = gumus.kaynak; }
+
+  let gramGumus = null;
+  if (onsGumus && usd) {
+    gramGumus = onsGumus * usd / GRAM_ONS;
+    kaynaklar.gramGumus = 'hesaplandı (ons × USD/TRY ÷ 31,1035)';
+  }
+
   let bistDeger = null;
   if (bist) { bistDeger = bist.deger; kaynaklar.bist = bist.kaynak; }
 
   const govde = JSON.stringify({
-    usd, eur, onsAltin, gramAltin, bist: bistDeger,
+    usd, eur, onsAltin, gramAltin, onsGumus, gramGumus, bist: bistDeger,
     kaynaklar,
     hatalar: hatalar.length ? hatalar : undefined,
     zaman: Date.now()
   });
 
-  const cevap = new Response(govde, { headers: { ...basliklar, 'Cache-Control': 'public, max-age=60' } });
+  const cevap = new Response(govde, { headers: { ...basliklar, 'Cache-Control': 'public, max-age=300' } });
   await onbellek.put(anahtar, cevap.clone());
   return cevap;
 }
@@ -112,7 +124,7 @@ async function json(url, secenek = {}) {
   const c = await fetch(url, {
     ...secenek,
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ParaBilinci/1.0)', Accept: 'application/json', ...(secenek.headers || {}) },
-    cf: { cacheTtl: 60, cacheEverything: true }
+    cf: { cacheTtl: 300, cacheEverything: true }
   });
   if (!c.ok) throw new Error('HTTP ' + c.status);
   return c.json();
@@ -157,6 +169,21 @@ async function onsAltinCek() {
   }
 }
 
+/** Ons gümüş (USD). */
+async function onsGumusCek() {
+  try {
+    const d = await json('https://api.gold-api.com/price/XAG');
+    const p = Number(d && (d.price ?? d.Price));
+    if (p > 0) return { deger: p, kaynak: 'gold-api.com' };
+    throw new Error('yanıt geçersiz');
+  } catch {
+    const d = await json('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?range=1d&interval=1d');
+    const p = Number(d?.chart?.result?.[0]?.meta?.regularMarketPrice);
+    if (!(p > 0)) throw new Error('yahoo gümüş yanıtı geçersiz');
+    return { deger: p, kaynak: 'Yahoo Finance (SI=F vadeli)' };
+  }
+}
+
 /** BIST 100 endeksi. Tarayıcıdan çekilemeyen tek veri budur. */
 async function bistCek() {
   try {
@@ -168,7 +195,7 @@ async function bistCek() {
   } catch {
     const c = await fetch('https://stooq.com/q/l/?s=^bist&f=sd2t2ohlc&h&e=csv', {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ParaBilinci/1.0)' },
-      cf: { cacheTtl: 60, cacheEverything: true }
+      cf: { cacheTtl: 300, cacheEverything: true }
     });
     if (!c.ok) throw new Error('stooq HTTP ' + c.status);
     const satirlar = (await c.text()).trim().split('\n');
