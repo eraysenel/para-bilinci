@@ -1,0 +1,403 @@
+{
+  "_aciklama": "Para 101 mentor müfredatı. Sıfırdan ileriye, Türkiye ekonomisi bağlamında. Her dersin sonunda tek bir uygulanabilir eylem var.",
+  "moduller": [
+    {
+      "id": "m1",
+      "ad": "Para 101 — Temeller",
+      "ozet": "Para nedir, neden erir, senin için ne anlama gelir.",
+      "ikon": "◈",
+      "dersler": [
+        {
+          "id": "m1d1",
+          "ad": "Para = donmuş zaman",
+          "sure": 4,
+          "icerik": [
+            "Elindeki para, geçmişte harcadığın saatlerin depolanmış hâlidir. Bir şeyin fiyatına bakarken 'kaç lira' değil 'kaç saatim' diye sormak, kararı bambaşka bir yere taşır.",
+            "Saat ücretin = aylık net gelirin ÷ aylık çalışma saatin. Tam zamanlı bir çalışan için ayda ortalama 180 saat civarıdır.",
+            "Bu araç her fiyatı otomatik olarak saate çevirir. Amaç seni suçlamak değil; kararı görünür kılmak.",
+            "Bir şeye 'pahalı' demek yerine 'bu bana 9 saate mal oluyor, değer mi?' diye sor. Bazen cevap evettir. Sorun harcamak değil, farkında olmadan harcamak."
+          ],
+          "eylem": "Nakit Akışı ekranına net gelirini gir; uygulama saat ücretini hesaplasın."
+        },
+        {
+          "id": "m1d2",
+          "ad": "Enflasyon: paranın sessiz eridiği yer",
+          "sure": 6,
+          "icerik": [
+            "Enflasyon, aynı parayla daha az şey alabilmendir. Türkiye'de yıllık enflasyon uzun süredir çift hanede seyrediyor; bu, birikimin hiçbir şey yapmasan bile değer kaybettiği anlamına gelir.",
+            "Kritik ayrım: NOMİNAL getiri, paranın rakam olarak artışıdır. REEL getiri, enflasyondan arta kalandır. %40 faiz aldın ama enflasyon %50 ise reel getirin negatiftir — zengin değil, daha fakir oldun.",
+            "Reel getiri formülü: (1 + nominal) ÷ (1 + enflasyon) − 1. Kabaca 'faiz eksi enflasyon' demek küçük oranlarda işe yarar, yüksek oranlarda yanıltır.",
+            "Bu yüzden 'TL biriktirmek' tek başına bir strateji değildir. TL, kısa vadede ihtiyacın olan para için bir ARAÇTIR; uzun vadeli değer saklama aracı değildir.",
+            "Ama tersi de doğru değil: her şeyi dövize çevirip günlük hayatını yönetememek de bir hatadır. Ayrım, paranın NE ZAMAN lazım olacağıdır."
+          ],
+          "eylem": "Enflasyon ekranını aç; TÜİK ve ENAG'ın açıkladığı son oranlara bak."
+        },
+        {
+          "id": "m1d3",
+          "ad": "Paranın üç kovası: zaman ufku",
+          "sure": 5,
+          "icerik": [
+            "Her lirayı 'ne zaman lazım olacak' sorusuna göre üç kovaya ayır:",
+            "1) BUGÜN KOVASI (0–1 ay): kira, faturalar, market, ulaşım. Bu para TL'de ve anında erişilebilir durmalı. Getiri aramazsın; erişilebilirlik ararsın.",
+            "2) YAKIN KOVA (1–12 ay): acil durum fonu, bilinen büyük ödemeler (vergi, sigorta, okul). Erişilebilir ama en azından enflasyonla yarışan bir yerde durmalı.",
+            "3) UZAK KOVA (1 yıl+): gerçek birikim. Burada amaç reel getiridir; dalgalanmaya tahammülün vardır çünkü yarın lazım olmayacak.",
+            "En sık yapılan hata: uzak kova varlıklarını (altın, döviz, hisse) bugün kovası ihtiyacı çıkınca zararına bozmak. Bu yüzden önce bugün ve yakın kova dolar, sonra uzak kovaya geçilir."
+          ],
+          "eylem": "Yatırım ekranında varlıklarını gir ve hangi kovada olduklarını gör."
+        },
+        {
+          "id": "m1d4",
+          "ad": "Nakit akışı: gerçek tablo",
+          "sure": 5,
+          "icerik": [
+            "Zengin olmak yüksek gelir değil, gelir ile giderin arasındaki açıklıktır. Ayda 200 bin kazanıp 205 bin harcayan kişi, 40 bin kazanıp 32 bin harcayandan daha kötü durumdadır.",
+            "Nakit akışının üç katmanı var: SABİT giderler (kira, fatura, taksit — kaçamazsın), DEĞİŞKEN giderler (market, ulaşım, yeme-içme — yönetebilirsin), İSTEĞE BAĞLI (eğlence, alışveriş — seçersin).",
+            "Sabit giderleri küçültmek en güçlü hamledir çünkü her ay tekrar eder. 1.500 TL'lik bir aboneliği iptal etmek, yılda 18.000 TL demektir — ve bir daha uğraşmazsın.",
+            "Değişken giderde amaç kısmak değil, GÖRMEKTİR. Görülmeyen harcama yönetilemez."
+          ],
+          "eylem": "Sabit giderlerini tek tek gir. Sadece bu bile ilk ayda tablonu değiştirir."
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "ad": "Elde Tutulacak Para",
+      "ozet": "Ne kadarı dokunulmaz, ne kadarı harcanabilir.",
+      "ikon": "◉",
+      "dersler": [
+        {
+          "id": "m2d1",
+          "ad": "Harcanabilir para ≠ hesabındaki para",
+          "sure": 5,
+          "icerik": [
+            "Hesabında 20.000 TL görmek '20.000 TL'm var' demek değildir. Ayın 20'sinde ödenecek 6.000 TL kira, 2.400 TL fatura ve 3.000 TL taksit varsa, gerçek harcanabilir paran 8.600 TL'dir.",
+            "Bu araç bu yüzden iki ayrı rakam gösterir: REZERVE (vadesi gelecek yükümlülükler için ayrılmış, dokunulmaz) ve SERBEST (gerçekten senin olan).",
+            "Ay ortasında para bitmesinin bir numaralı sebebi budur: insanlar rezerve parayı harcanabilir sanır.",
+            "Kural: gelir geldiği gün önce yükümlülükleri ayır, kalanı güne böl. Bu sıralamayı ters çevirmek, ay sonunda kredi kartına gitmek demektir."
+          ],
+          "eylem": "Bugün ekranındaki 'Serbest' rakamına bak — 'Toplam'a değil."
+        },
+        {
+          "id": "m2d2",
+          "ad": "Acil durum fonu: kaç aylık?",
+          "sure": 6,
+          "icerik": [
+            "Acil fon, bir gelir kesintisinde hayatını kaç ay sürdürebileceğindir. Yatırım değildir; sigortadır. Getiri beklemezsin, uyku beklersin.",
+            "Hedef, aylık ZORUNLU giderinin katıdır — toplam giderinin değil. Zorunlu = kira + fatura + market + ulaşım + ilaç + taksit.",
+            "Kaç ay olmalı, duruma göre değişir: tek gelirli hane ve bakmakla yükümlü olduğun kişi sayısı arttıkça hedef yükselir. Bu araç bunu senin hane bilgine göre hesaplar.",
+            "Acil fon TL'de tamamen erimemeli, ama tamamen erişilmez de olmamalı. Yaygın yaklaşım: bir kısmı anında erişilebilir TL'de, kalanı enflasyona karşı korunaklı ama 1-2 günde nakde çevrilebilir bir yerde.",
+            "Acil fon 'acil' içindir: iş kaybı, sağlık, ev/araç arızası. İndirim acil değildir. Tatil acil değildir."
+          ],
+          "eylem": "Hane bilgini gir, önerilen acil fon hedefini gör."
+        },
+        {
+          "id": "m2d3",
+          "ad": "Bakmakla yükümlü olduğun kişiler",
+          "sure": 4,
+          "icerik": [
+            "Kaç kişiye baktığın, bütçenin matematiğini kökten değiştirir. Kişi başı maliyet doğrusal artmaz ama sabit giderler (kira, ısınma) paylaşılırken değişken giderler (market, sağlık, giyim) kişiyle çarpılır.",
+            "Çocuk sayısı ayrıca 'öngörülemeyen gider' riskini artırır: okul, sağlık, büyüme kaynaklı giyim. Bu yüzden çocuklu hanelerde acil fon hedefi daha yüksektir.",
+            "Tek gelirli hanede risk yoğunlaşır: gelir kesilirse alternatif yoktur. İki gelirli hanede acil fon hedefi görece düşük tutulabilir.",
+            "Bu araç hane yapını dikkate alarak günlük harcanabilir tutarı ve acil fon hedefini ayarlar."
+          ],
+          "eylem": "Nakit Akışı > Hane bölümünü doldur."
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "ad": "Faturalar, Öncelik ve Aciliyet",
+      "ozet": "Para yetmediğinde önce hangisi ödenir.",
+      "ikon": "◧",
+      "dersler": [
+        {
+          "id": "m3d1",
+          "ad": "Her borç eşit değildir",
+          "sure": 6,
+          "icerik": [
+            "Para her şeye yetmediğinde 'hangisini ödeyeyim' sorusu duygusal değil, matematiksel bir sorudur. Üç ölçüt vardır:",
+            "1) KESİNTİ RİSKİ: Ödenmezse hayatını durduran şeyler önce gelir. Elektrik, su, doğalgaz, kira, sağlık. Bunlar geri açtırma bedeli de doğurur.",
+            "2) BİLEŞİK MALİYET: Gecikince üstüne faiz bindiren borçlar. Kredi kartı bu grubun en pahalısıdır — gecikme faizi akdi faizden de yüksektir.",
+            "3) KREDİ SKORU ETKİSİ: Bankaya olan yükümlülüklerin gecikmesi kredi notuna işler ve yıllarca peşini bırakmaz. Arkadaşına olan borcun gecikmesi skoruna işlemez (ama ilişkine işler).",
+            "Bu araç yükümlülüklerini bu üç ölçüte göre puanlayıp sana bir ödeme sırası verir. Sıra, duyguya göre değil zarara göre kurulur."
+          ],
+          "eylem": "Faturalar ekranında vadeleri gir; öncelik sırasını gör."
+        },
+        {
+          "id": "m3d2",
+          "ad": "Vade takvimi ve gelir eşleşmesi",
+          "sure": 5,
+          "icerik": [
+            "Sorun çoğu zaman 'para yok' değil, 'para o gün yok'tur. Maaş 15'inde geliyor, faturaların 5'inde kesiliyorsa, aslında yeterli gelirle bile her ay sıkışırsın.",
+            "İki çözüm var: ödeme günlerini gelire yaklaştırmak (çoğu kurum fatura kesim tarihini değiştirebilir), ya da bir ay öne geçmek için bir defalık bir tampon oluşturmak.",
+            "Bir ay öne geçmek, para yönetiminde en rahatlatıcı eşiktir: bu ayın geliriyle gelecek ayı yaşamak. Oraya ulaşınca ay ortası paniği biter.",
+            "Bu araç faturalarını takvime yayar ve hangi günlerde yığılma olduğunu gösterir."
+          ],
+          "eylem": "Faturalar ekranındaki takvimde yığılma olan günlere bak."
+        },
+        {
+          "id": "m3d3",
+          "ad": "Otomatik ödeme ve abonelik sızıntısı",
+          "sure": 4,
+          "icerik": [
+            "Otomatik ödeme talimatı gecikmeyi önler ama görünmezliği artırır. Kural: otomatik ödeme kur, ama ayda bir kez listeyi gözden geçir.",
+            "Abonelikler bütçenin en sinsi kalemidir çünkü tek tek küçük, toplamda büyüktür. Aylık 300 TL'lik altı abonelik, yılda 21.600 TL eder.",
+            "Yıllık ödemeli abonelikler aylıktan ucuzdur ama sadece gerçekten yıl boyu kullanacaksan. Kullanmadığın bir şeyi ucuza almak tasarruf değildir.",
+            "Test: son 30 günde kullanmadığın her aboneliği dondur. Özlersen geri açarsın — çoğunu özlemezsin."
+          ],
+          "eylem": "Faturalar ekranında aboneliklerini 'abonelik' türüyle işaretle ve toplamı gör."
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "ad": "Borç, Taksit ve Kredi Kartı",
+      "ozet": "Borçtan çıkışın matematiği. Eksi olmak sorun değil; yönetilmemesi sorun.",
+      "ikon": "◩",
+      "dersler": [
+        {
+          "id": "m4d1",
+          "ad": "Asgari ödeme tuzağı",
+          "sure": 8,
+          "icerik": [
+            "Asgari ödeme, kartının kapanmasını önleyen en düşük tutardır — borcunu bitiren tutar değildir. Asgari ödemek, bankaya 'kalanına faiz işlet' demektir.",
+            "Kredi kartı faizi aylık işler ve bileşiktir. Aylık %3,25 masum görünür ama yıllık bileşiği %46'yı aşar. Aylık %4,25 ise yıllık %64'ün üzerine çıkar.",
+            "Asgari ödeme oranı kart LİMİTİNE göre belirlenir: limiti 50.000 TL ve altında olan kartlarda dönem borcunun %20'si, üzerinde olanlarda %40'ı.",
+            "Sadece asgari ödemeye devam edersen borç yıllarca sürebilir ve ödediğin toplam, aldığın malın katı olur. Bu araç bunu senin gerçek rakamlarınla ay ay hesaplayıp gösterir.",
+            "Ayrıca yasal bir kısıt var: bir takvim yılında üç kez asgarinin altında ödeme yaparsan kart nakit çekime ve limit artırımına kapatılır.",
+            "Kural: kredi kartı bir ödeme aracıdır, bir kredi kaynağı değil. Dönem borcunun tamamını ödeyemeyeceğin bir harcamayı karta yazma."
+          ],
+          "eylem": "Borç ekranında kartını gir, 'asgari mi tam mı' karşılaştırmasını çalıştır."
+        },
+        {
+          "id": "m4d2",
+          "ad": "Taksit: ertelenmiş acı",
+          "sure": 6,
+          "icerik": [
+            "Taksit, fiyatı küçültmez; acıyı böler. 12 taksitle aldığın şey, 12 ay boyunca gelecekteki gelirini ipotek eder.",
+            "Asıl tehlike birikmedir: tek başına makul görünen taksitler üst üste binince, maaşın önemli bir kısmı daha ay başlamadan taahhüt edilmiş olur.",
+            "Sağlıklı sınır: toplam aylık taksit + kredi ödemesi, net gelirinin %30'unu geçmemeli. %50'yi geçtiyse teknik olarak borç sarmalındasın.",
+            "'Faizsiz taksit' gerçekten faizsiz olabilir — ama peşin fiyat pazarlığı yapma imkânını kaybedersin ve satın alma kararını kolaylaştırdığı için daha çok harcatır.",
+            "Bu araç tüm taksitlerini aylara yayar ve önümüzdeki 12 ayda her ay ne kadarının zaten taahhütlü olduğunu gösterir."
+          ],
+          "eylem": "Borç ekranında taksitlerini gir, 12 aylık taahhüt grafiğine bak."
+        },
+        {
+          "id": "m4d3",
+          "ad": "Çığ mı, kartopu mu?",
+          "sure": 6,
+          "icerik": [
+            "Birden fazla borcun varsa iki yöntem vardır. İkisi de işe yarar; farkları matematik ve motivasyon arasındadır.",
+            "ÇIĞ (avalanche): En yüksek faizli borçtan başlarsın. Matematiksel olarak en az faiz ödersin. En hızlı ve en ucuz yoldur.",
+            "KARTOPU (snowball): En küçük bakiyeli borçtan başlarsın. Daha çok faiz ödersin ama ilk borcu bitirmenin verdiği moral, devam etmeni sağlar.",
+            "Hangisi? Borç sarmalında en büyük risk pes etmektir. Motivasyona ihtiyacın varsa kartopu, disiplinden eminsen çığ.",
+            "Her iki yöntemde de kural aynı: tüm borçlara asgariyi öde, FAZLA parayı tek bir hedef borca yığ. Fazlayı dağıtmak en yavaş yöntemdir.",
+            "Bu araç iki yöntemi senin borçlarınla yan yana çalıştırır: kaç ayda biter, toplam ne kadar faiz ödersin."
+          ],
+          "eylem": "Borç ekranında iki stratejiyi karşılaştır, birini seç ve uygula."
+        },
+        {
+          "id": "m4d4",
+          "ad": "Eksideyken yatırım yapılır mı?",
+          "sure": 5,
+          "icerik": [
+            "Genel kural: bir borcun faizi, yatırımdan bekleyebileceğin reel getiriden yüksekse, önce borcu kapatmak KESİN getiridir.",
+            "Kredi kartı borcunu kapatmak, yıllık %46–64 garanti getiri demektir. Hiçbir yatırım bunu garanti etmez. Bu yüzden kart borcu her zaman yatırımdan önce gelir.",
+            "İstisna: acil durum fonu. Borcunu kapatmak için acil fonunu sıfırlarsan, ilk aksilikte tekrar karta gidersin ve döngü baştan başlar. Önce küçük bir tampon (1 aylık zorunlu gider), sonra borç saldırısı, sonra tam acil fon.",
+            "Düşük faizli, uzun vadeli borçlarda (örneğin çok eski tarihli düşük faizli konut kredisi) erken kapatmak her zaman en iyisi olmayabilir — enflasyon borcun reel yükünü de eritir.",
+            "Eksi olmak bir karakter kusuru değil, bir tablo durumudur. Tabloyu görmek onu değiştirmenin ilk adımıdır."
+          ],
+          "eylem": "Borç ekranındaki 'önce hangisi' sıralamasına bak."
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "ad": "Kredi Skoru",
+      "ozet": "Nasıl hesaplanır, nasıl yükselir.",
+      "ikon": "◪",
+      "dersler": [
+        {
+          "id": "m5d1",
+          "ad": "Kredi notu nedir, ne işe yarar",
+          "sure": 5,
+          "icerik": [
+            "Findeks kredi notu (KKB tarafından hesaplanır) 1 ile 1900 arasında bir puandır. Bankaların sana kredi verirken baktığı ilk sayıdır.",
+            "Yüksek not sadece 'kredi alabilmek' demek değildir; daha düşük faiz, daha yüksek limit ve daha hızlı onay demektir. Aynı krediyi iki kişi farklı faizle alır — fark nottur.",
+            "Not, sana ait tek bir davranışın değil, tüm finansal geçmişinin özetidir. Bu yüzden hızlı yükselmez; ama hızlı düşer.",
+            "Findeks'in herkese açık bir API'si yoktur, dolayısıyla bu araç notunu otomatik çekemez. Findeks'ten öğrenip buraya elle girersin; araç zaman içindeki değişimini grafikler."
+          ],
+          "eylem": "Kredi Skoru ekranına güncel notunu gir."
+        },
+        {
+          "id": "m5d2",
+          "ad": "Notu belirleyen beş bileşen",
+          "sure": 7,
+          "icerik": [
+            "1) ÖDEME GEÇMİŞİ (~%45): En ağır kalem. Zamanında ödeme. Tek bir gecikme bile uzun süre kayıtta kalır. Ödeyemeyeceksen bile ASGARİYİ öde — gecikme kaydı, kısmi ödemeden çok daha ağır zarar verir.",
+            "2) MEVCUT HESAP DURUMU (~%22): Şu an gecikmede olan hesabın var mı, kaç ürün kullanıyorsun. Kapanmış bir gecikme, açık bir gecikmeden iyidir.",
+            "3) KREDİ KULLANIM YOĞUNLUĞU (~%18): Limitinin ne kadarını kullandığın. 100.000 limitin varsa ve 90.000 kullanıyorsan bu risk sinyalidir. %30'un altında tutmak notu destekler.",
+            "4) YENİ BAŞVURULAR (~%8): Kısa sürede çok sayıda kredi/kart başvurusu 'para sıkıntısı' sinyali verir. Kredi ararken kısa aralıklarla birçok bankaya başvurma.",
+            "5) GEÇMİŞ UZUNLUĞU (~%7): Ne kadar süredir düzenli ürün kullandığın. En eski kartını kapatmak geçmişini kısaltır ve notunu düşürebilir — kullanmıyorsan bile açık tutmayı düşün.",
+            "Not: bu ağırlıklar KKB'nin yayımladığı genel çerçevedir; kesin formül kamuya açık değildir."
+          ],
+          "eylem": "Kredi Skoru ekranında kart kullanım oranını hesapla."
+        },
+        {
+          "id": "m5d3",
+          "ad": "Notu yükseltmenin gerçekçi yolu",
+          "sure": 6,
+          "icerik": [
+            "Notu yükseltmenin kestirmesi yoktur; zaman ve düzen ister. Ama etkili sıralama şudur:",
+            "1) Önce gecikmeleri durdur. Açık gecikme varsa her şeyden önce onu kapat. Otomatik ödeme talimatı kur.",
+            "2) Kart kullanım oranını düşür. Limitinin %30'unun altına in. Bunu ya borcu azaltarak ya da (dikkatli kullanıyorsan) limit artırarak yaparsın.",
+            "3) Başvuru yapmayı bırak. 3–6 ay hiç yeni başvuru yapmamak görünür fark yaratır.",
+            "4) Eski hesapları kapatma. Geçmiş uzunluğu senin lehine çalışıyor.",
+            "5) Az sayıda ürünü düzenli kullan. Hiç ürün kullanmamak da not üretmez — 'kredi geçmişi yok' düşük not demektir.",
+            "Gerçekçi beklenti: düzenli davranışla 3–6 ayda anlamlı, 12 ayda belirgin iyileşme görülür. Bir gecede yükselteceğini söyleyen herkes yanlış söylüyor."
+          ],
+          "eylem": "Kredi Skoru ekranındaki eylem listesinden bu ay yapabileceğin birini seç."
+        }
+      ]
+    },
+    {
+      "id": "m6",
+      "ad": "Harcama Kararları",
+      "ozet": "İndirime, kampanyaya, 'bunu al' diyene karşı kendi planın.",
+      "ikon": "◫",
+      "dersler": [
+        {
+          "id": "m6d1",
+          "ad": "İndirim bir teklif değil, bir tetikleyicidir",
+          "sure": 6,
+          "icerik": [
+            "İndirim, ihtiyacın olan bir şeyin ucuzlamasıdır — eğer zaten alacaktıysan. İhtiyacın yoksa %70 indirim, %30 israftır.",
+            "Perakendenin kullandığı tetikleyiciler ölçülebilir ve tekrar eder: yapay kıtlık ('son 2 ürün'), geri sayım, referans fiyat (üstü çizili yüksek fiyat), paket büyütme ('2 al 1 öde'), ücretsiz kargo eşiği.",
+            "Ücretsiz kargo eşiği en etkilisidir: 50 TL kargodan kaçmak için 200 TL'lik gereksiz ürün eklersin.",
+            "Savunma tek ve basittir: liste. Listede olmayanı alma. Listeyi mağazada değil, evde yap.",
+            "İkinci savunma: bekleme. Bu araç istek olarak eklediğin her şeye bir bekleme süresi koyar. Süre dolduğunda hâlâ istiyorsan al — çoğu istek o süreyi geçemez."
+          ],
+          "eylem": "Kararlar ekranına almak istediğin bir şeyi ekle ve süreyi başlat."
+        },
+        {
+          "id": "m6d2",
+          "ad": "İhtiyaç mı, istek mi — dürüst test",
+          "sure": 5,
+          "icerik": [
+            "Bunu üç soruyla ayır: (1) Bu olmazsa önümüzdeki 30 günde hayatım aksar mı? (2) Elimde bunun işini gören bir şey var mı? (3) Bunu iki hafta önce de istiyor muydum?",
+            "Üçüne de 'evet, hayır, evet' diyorsan ihtiyaçtır. Aksi hâlde istektir — ve istek almak yasak değildir, sadece plandan alınır.",
+            "Sağlıklı bütçede isteklere ayrılmış bir pay olmalı. Sıfır eğlence bütçesi, tıpkı aşırı katı diyet gibi, bir noktada patlar.",
+            "Fark şu: planlı istek bütçeden çıkar, plansız istek gelecekten çıkar."
+          ],
+          "eylem": "Kararlar ekranında bekleyen kalemleri ihtiyaç/istek olarak işaretle."
+        },
+        {
+          "id": "m6d3",
+          "ad": "Market: en yönetilebilir kalem",
+          "sure": 6,
+          "icerik": [
+            "Market, bütçenin hem en büyük hem de en çok esneyen değişken kalemidir. Küçük düzenlemeler burada büyük fark yaratır.",
+            "Birim fiyata bak, paket fiyatına değil. 'Büyük paket her zaman ucuzdur' doğru değildir; kilogram/litre fiyatını karşılaştır.",
+            "Aç karnına markete girme — ölçülmüş ve tekrarlanan bir etkidir; sepet büyür.",
+            "Fiyatı düzenli aldığın 10–15 üründen takip et. Bu araç senin kendi sepetinin enflasyonunu hesaplar: TÜİK'in ortalaması değil, SENİN alışverişinin gerçek artışı.",
+            "Kendi enflasyonunu bilmek, zam pazarlığından yatırım kararına kadar her şeyin temelidir. Ortalama kimsenin gerçeği değildir."
+          ],
+          "eylem": "Enflasyon ekranında sepetine 5 ürün ekle, fiyatlarını her ay güncelle."
+        }
+      ]
+    },
+    {
+      "id": "m7",
+      "ad": "Mutfak Ekonomisi",
+      "ozet": "Evde hazırlamanın gerçek maliyeti.",
+      "ikon": "◨",
+      "dersler": [
+        {
+          "id": "m7d1",
+          "ad": "Porsiyon başı maliyet",
+          "sure": 6,
+          "icerik": [
+            "'Evde yapmak daha ucuz' bir slogan değil, hesaplanabilir bir şeydir — ve hesaplamadan tartışılmaz.",
+            "Porsiyon maliyeti = (malzeme maliyetleri toplamı ÷ çıkan porsiyon sayısı). Buna enerji ve zaman da eklenebilir ama malzeme kalemi tek başına farkın büyük kısmını açıklar.",
+            "Dışarıda yemek fiyatı sadece malzemeyi değil kirayı, personeli, vergiyi ve kârı da içerir. Bu yüzden fark genellikle katlar düzeyindedir, yüzdeler değil.",
+            "Asıl mesele tek öğün değil, TEKRARDIR. Haftada 5 öğünlük bir fark, yılda 260 öğün eder. Bu araç farkı yıllığa çevirir ve o paranın ne edeceğini gösterir.",
+            "Amaç dışarıda hiç yememek değil. Amaç, dışarıda yemenin bir SEÇİM olması — bir varsayılan değil."
+          ],
+          "eylem": "Mutfak ekranında bir tarif oluştur ve porsiyon maliyetini hesapla."
+        },
+        {
+          "id": "m7d2",
+          "ad": "Toplu pişirme ve israf",
+          "sure": 5,
+          "icerik": [
+            "Gıda israfı görünmeyen bir gider kalemidir: çöpe giden her ürün, ödediğin ama tüketmediğin paradır.",
+            "Toplu pişirme (batch cooking) iki fayda verir: birim maliyet düşer ve yorgun günlerde 'sipariş verelim' refleksini engeller. Asıl tasarruf ikincisindedir.",
+            "Alışverişi haftalık planla, menüyü önce yaz. Malzeme listesi menüden çıkar — tersi değil.",
+            "Dondurucu bir tasarruf aracıdır. Fazla pişen yemeği porsiyonlayıp dondurmak, gelecekteki bir sipariş kararını şimdiden iptal eder."
+          ],
+          "eylem": "Mutfak ekranında haftalık sipariş sayını gir ve yıllık farkı gör."
+        }
+      ]
+    },
+    {
+      "id": "m8",
+      "ad": "Yatırım ve Büyüme",
+      "ozet": "TL erirken değeri korumak ve büyütmek.",
+      "ikon": "◭",
+      "dersler": [
+        {
+          "id": "m8d1",
+          "ad": "Yatırımın ön koşulları",
+          "sure": 5,
+          "icerik": [
+            "Yatırıma başlamadan önce üç şey tamam olmalı: (1) yüksek faizli borcun kapalı, (2) en az 1 aylık zorunlu gider tamponun var, (3) önümüzdeki 12 ayda o paraya ihtiyacın yok.",
+            "Bu üçü yoksa yatırım yapmıyorsun — kumar oynuyorsun, çünkü ilk aksilikte zararına satmak zorunda kalacaksın.",
+            "Yatırımın amacı zengin olmak değil, paranın satın alma gücünü korumak ve üstüne reel getiri koymaktır. Enflasyonun üstünde kalmak zaten başarıdır.",
+            "Türkiye bağlamında bu özellikle önemlidir: hiçbir şey yapmamak nötr bir seçim değildir; hiçbir şey yapmamak reel kayıptır."
+          ],
+          "eylem": "Yatırım ekranında ön koşul kontrol listesini çalıştır."
+        },
+        {
+          "id": "m8d2",
+          "ad": "Çeşitlendirme ve varlık dağılımı",
+          "sure": 7,
+          "icerik": [
+            "Tek bir varlığa yığmak, o varlık ne kadar mantıklı görünürse görünsün, en büyük risktir. Döviz de, altın da, hisse de kendi içinde dönemsel olarak kaybettirir.",
+            "Çeşitlendirmenin amacı en yüksek getiriyi yakalamak değil; en kötü senaryoda ayakta kalmaktır.",
+            "Varlık sınıfları farklı işler yapar: mevduat/para piyasası nakde yakınlık ve faiz; döviz kur riskine karşı koruma; altın kriz ve belirsizlik dönemlerinde sığınak; hisse/fon uzun vadede büyüme.",
+            "Dağılımını zaman ufkuna ve risk tahammülüne göre belirle, sonra ona SADIK KAL. Piyasa hareket ettikçe dağılımını değiştirmek, en çok zarar ettiren davranıştır.",
+            "Dönemsel dengeleme (rebalancing): yılda bir veya iki kez hedef oranlara geri dön. Bu, otomatik olarak 'yükselenden sat, düşenden al' demektir.",
+            "Bu araç mevcut dağılımını hedef dağılımınla karşılaştırır ve sapmayı gösterir."
+          ],
+          "eylem": "Yatırım ekranında hedef dağılımını belirle."
+        },
+        {
+          "id": "m8d3",
+          "ad": "Düzenli alım (maliyet ortalaması)",
+          "sure": 6,
+          "icerik": [
+            "Piyasanın dibini yakalamaya çalışmak, profesyonellerin bile tutarlı biçimde başaramadığı bir iştir. Alternatifi düzenli alımdır: her ay aynı tutarı, fiyata bakmadan.",
+            "Bu yöntem fiyat düşükken daha çok, yüksekken daha az adet almanı sağlar; ortalama maliyetini kendiliğinden düzeltir.",
+            "Asıl faydası psikolojiktir: karar vermeyi ortadan kaldırır. Karar vermediğin yerde panikle satmazsın.",
+            "Tutarı gelirinden otomatik ayır — 'ay sonunda kalanı yatırırım' hiç yatıramamak demektir. Önce kendine öde.",
+            "Düzenli alımın gücü zamandadır. Küçük tutarlarla erken başlamak, büyük tutarlarla geç başlamayı çoğu zaman yener."
+          ],
+          "eylem": "Yatırım ekranında aylık düzenli alım tutarını belirle."
+        },
+        {
+          "id": "m8d4",
+          "ad": "Kendi planına sadık kalmak",
+          "sure": 5,
+          "icerik": [
+            "Herkesin bir tavsiyesi olacak: 'şuna gir', 'bu patlayacak', 'kaçırma'. Bu tavsiyelerin ortak özelliği, senin zaman ufkunu, borç durumunu ve hane sorumluluğunu bilmemeleridir.",
+            "Bir tavsiyeyi değerlendirirken üç şey sor: Bu kişi bu tavsiyeden kazanç sağlıyor mu? Yanılırsa bir bedel ödüyor mu? Benim durumumu biliyor mu?",
+            "Garantili yüksek getiri vaadi, istisnasız, ya yalan ya da gizlenmiş risktir. Yüksek getiri her zaman yüksek riskin ödülüdür.",
+            "Planın sıkıcı olmalı: hedef dağılım, düzenli alım, yılda bir denge. Sıkıcı plan, heyecanlı planı uzun vadede yener.",
+            "En büyük getiri kaynağın portföyün değil, davranışındır. Panikle satmamak, gereksiz alım yapmamak ve düzenli devam etmek — üçü birden çoğu stratejiyi geçer."
+          ],
+          "eylem": "Planını yaz ve bir sonraki gözden geçirme tarihini belirle."
+        }
+      ]
+    }
+  ]
+}
