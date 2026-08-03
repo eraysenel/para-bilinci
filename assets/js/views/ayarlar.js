@@ -1,6 +1,7 @@
 /* Ayarlar — tema, piyasa kaynağı, yedek, veri yönetimi. */
 
-import { durum, kaydet, yedekAl, yedekYukle, hepsiniSil, eskiVeriVar, eskiVeriSil } from '../core/store.js';
+import { durum, kaydet, yedekAl, yedekYukle, hepsiniSil, eskiVeriVar, eskiVeriSil, durumuDegistir } from '../core/store.js';
+import * as Kilit from '../core/kilit.js';
 import { piyasa, piyasayiCek, elleGir, proxyKaydet, gecmisOku, frenOzeti, frenDurumu } from '../core/market.js';
 import * as H from '../core/hesap.js';
 import { tl, n, yuzde, tarihUzun, bugun, goreliZaman, kac, sayiOku } from '../core/fmt.js';
@@ -12,9 +13,64 @@ export const ayarGorunum = {
   alt: 'Veri kaynakları, hesap tercihleri ve yedekleme. Tüm verilerin yalnızca bu cihazda durur.',
 
   ciz() {
-    return piyasaKart() + hesapKart() + veriKart() + hakkindaKart();
+    return kilitKart() + piyasaKart() + hesapKart() + veriKart() + hakkindaKart();
   }
 };
+
+/* ---------- kilit ---------- */
+
+function kilitKart() {
+  if (!Kilit.desteklenirMi()) {
+    return kart('Kilit', notKutu('uyari',
+      `Bu tarayıcı şifreleme desteklemiyor ya da sayfa güvenli olmayan bir bağlantı üzerinden açılmış.
+       Kilit özelliği <b>https</b> ya da <b>localhost</b> gerektirir.`), { ikon: '⚿' });
+  }
+
+  const kurulu = Kilit.kilitKurulu();
+  const kullanici = Kilit.kilitliKullanici();
+
+  if (!kurulu) {
+    return kart('Kilit', `
+      <p class="kucuk r-muted alt-12" style="line-height:1.65">
+        Bir kullanıcı adı ve şifre belirlersen verilerin bu cihazda <b>şifrelenir</b>.
+        Uygulama her açılışta şifre ister; şifreyi bilmeyen — tarayıcı konsolunu açan biri dahil —
+        kayıtlı veriyi okuyamaz.
+      </p>
+      ${notKutu('uyari',
+        `<b>Şifre sıfırlanamaz.</b> Sunucu yok, hesap yok, kurtarma anahtarı yok.
+         Şifreyi unutursan verilerin kalıcı olarak erişilemez hâle gelir.
+         Kilidi kurmadan önce <b>mutlaka yedek indir</b>.`)}
+      <div class="dg-grup ust-12">
+        <button class="dg-btn b-cizgi b-kucuk" data-eylem="yedek-al">↓ Önce yedek indir</button>
+        <button class="dg-btn b-ana b-kucuk" data-eylem="kilit-kur">⚿ Kilidi kur</button>
+      </div>`, { ikon: '⚿' });
+  }
+
+  return kart('Kilit', `
+    <div class="oge">
+      <div class="im" style="background:var(--em-dim);color:var(--em)">⚿</div>
+      <div class="gvd">
+        <div class="ad">Kilit açık ${rozet('şifreli', 'em')}</div>
+        <div class="ayr">
+          Kullanıcı: <b>${kac(kullanici || '—')}</b> ·
+          Veriler AES-GCM 256 ile şifreleniyor (PBKDF2-SHA256, 250.000 tur)
+        </div>
+      </div>
+    </div>
+
+    <div class="dg-grup ust-12">
+      <button class="dg-btn b-cizgi b-kucuk" data-eylem="kilit-kullanici">Kullanıcı adını değiştir</button>
+      <button class="dg-btn b-cizgi b-kucuk" data-eylem="kilit-sifre">Şifreyi değiştir</button>
+      <button class="dg-btn b-cizgi b-kucuk" data-eylem="kilitle">Şimdi kilitle</button>
+      <button class="dg-btn b-tehli b-kucuk" data-eylem="kilit-kaldir">Kilidi kaldır</button>
+    </div>
+
+    <div class="mini r-faint ust-12" style="line-height:1.65">
+      Yedek dosyaları <b>şifresiz</b> indirilir — kurtarma yolu olarak işe yaraması için.
+      Yedeğini güvenli bir yerde tut.
+      “Şimdi kilitle” bellekteki anahtarı siler ve şifre ekranına döner.
+    </div>`, { ikon: '⚿' });
+}
 
 /* ---------- piyasa ---------- */
 
@@ -289,4 +345,119 @@ eylemKaydet('eski-sil', async () => {
   eskiVeriSil();
   bildir('Eski veriler silindi.', 'bilgi');
   document.dispatchEvent(new CustomEvent('gorunum-yenile'));
+});
+
+
+/* ---------- kilit eylemleri ---------- */
+
+function gucCubugu(sifre) {
+  const g = Kilit.sifreGucu(sifre);
+  return `<div class="guc-cubuk">${[0,1,2,3].map(i =>
+    `<i style="background:${i < g.puan ? `var(--${g.renk})` : 'var(--surface-3)'}"></i>`).join('')}</div>
+    <div class="mini r-${g.renk}" style="margin-top:4px">${kac(g.ad)}</div>`;
+}
+
+function gucBagla(kok) {
+  const alanSifre = kok.querySelector('input[name="sifre"]');
+  const hedef = kok.querySelector('#gucKap');
+  if (!alanSifre || !hedef) return;
+  alanSifre.addEventListener('input', () => { hedef.innerHTML = gucCubugu(alanSifre.value); });
+}
+
+eylemKaydet('kilit-kur', () => {
+  const m = modalAc({
+    baslik: 'Kilidi kur',
+    govde: `
+      ${notKutu('uyari',
+        `<b>Son uyarı:</b> şifre sıfırlanamaz. Unutursan verilerin kurtarılamaz.
+         Yedek almadıysan önce vazgeç, yedek indir, sonra geri gel.`)}
+      <div class="ust-12">${alan('Kullanıcı adı', girdi('kullanici', { yer: 'Adın ya da takma adın' }), 'kilit ekranında görünür')}</div>
+      ${alan('Şifre', girdi('sifre', { tur: 'password', yer: 'en az 6 karakter' }))}
+      <div id="gucKap"></div>
+      <div class="ust-12">${alan('Şifre (tekrar)', girdi('sifre2', { tur: 'password' }))}</div>`,
+    dugmeler: [
+      { ad: 'Vazgeç', sinif: 'b-cizgi' },
+      {
+        ad: 'Kilidi kur', sinif: 'b-ana', tikla: kok => {
+          const f = formOku(kok);
+          if (!f.sifre || f.sifre.length < 6) { bildir('Şifre en az 6 karakter olmalı.', 'hata'); return false; }
+          if (f.sifre !== f.sifre2) { bildir('Şifreler aynı değil.', 'hata'); return false; }
+          Kilit.kilitKur(f.kullanici, f.sifre, durum)
+            .then(() => bildir('Kilit kuruldu. Verilerin artık bu cihazda şifreli.'))
+            .then(() => document.dispatchEvent(new CustomEvent('gorunum-yenile')))
+            .catch(e => bildir('Kurulamadı: ' + e.message, 'hata', 5000));
+        }
+      }
+    ]
+  });
+  gucBagla(m);
+});
+
+eylemKaydet('kilit-sifre', () => {
+  const m = modalAc({
+    baslik: 'Şifreyi değiştir',
+    govde: `
+      ${alan('Mevcut şifre', girdi('eski', { tur: 'password' }))}
+      ${alan('Yeni şifre', girdi('sifre', { tur: 'password', yer: 'en az 6 karakter' }))}
+      <div id="gucKap"></div>
+      <div class="ust-12">${alan('Yeni şifre (tekrar)', girdi('sifre2', { tur: 'password' }))}</div>`,
+    dugmeler: [
+      { ad: 'Vazgeç', sinif: 'b-cizgi' },
+      {
+        ad: 'Değiştir', sinif: 'b-ana', tikla: kok => {
+          const f = formOku(kok);
+          if (!f.sifre || f.sifre.length < 6) { bildir('Yeni şifre en az 6 karakter olmalı.', 'hata'); return false; }
+          if (f.sifre !== f.sifre2) { bildir('Şifreler aynı değil.', 'hata'); return false; }
+          Kilit.sifreDegistir(f.eski, f.sifre)
+            .then(() => bildir('Şifre değiştirildi.'))
+            .catch(e => bildir(e.message, 'hata', 5000));
+        }
+      }
+    ]
+  });
+  gucBagla(m);
+});
+
+eylemKaydet('kilit-kullanici', () => {
+  modalAc({
+    baslik: 'Kullanıcı adı',
+    govde: alan('Kilit ekranında görünecek ad',
+      girdi('kullanici', { deger: Kilit.kilitliKullanici(), yer: 'Adın ya da takma adın' })),
+    dugmeler: [
+      { ad: 'Vazgeç', sinif: 'b-cizgi' },
+      {
+        ad: 'Kaydet', sinif: 'b-ana', tikla: kok => {
+          Kilit.kullaniciDegistir(formOku(kok).kullanici);
+          bildir('Kaydedildi.');
+          document.dispatchEvent(new CustomEvent('gorunum-yenile'));
+        }
+      }
+    ]
+  });
+});
+
+eylemKaydet('kilit-kaldir', () => {
+  modalAc({
+    baslik: 'Kilidi kaldır',
+    govde: `
+      <p class="kucuk r-muted alt-12" style="line-height:1.65">
+        Kilit kaldırılınca verilerin bu cihazda <b>şifresiz</b> saklanmaya döner
+        ve uygulama açılışta şifre sormaz.
+      </p>
+      ${alan('Mevcut şifren', girdi('sifre', { tur: 'password' }))}`,
+    dugmeler: [
+      { ad: 'Vazgeç', sinif: 'b-cizgi' },
+      {
+        ad: 'Kilidi kaldır', sinif: 'b-tehli', tikla: kok => {
+          Kilit.kilitKaldir(formOku(kok).sifre)
+            .then(veri => {
+              durumuDegistir(veri);
+              bildir('Kilit kaldırıldı.', 'bilgi');
+              document.dispatchEvent(new CustomEvent('gorunum-yenile'));
+            })
+            .catch(e => bildir(e.message, 'hata', 5000));
+        }
+      }
+    ]
+  });
 });

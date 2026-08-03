@@ -1,6 +1,8 @@
 /* Para Bilinci — uygulama kabuğu, yönlendirme ve başlatma. */
 
-import { durum, kaydet, dinle, abone } from './core/store.js';
+import { durum, kaydet, dinle, abone, durumuDegistir } from './core/store.js';
+import * as Kilit from './core/kilit.js';
+import { kilitEkraniGoster } from './views/kilitEkrani.js';
 import { piyasayiCek, piyasayiHazirla, frenOzeti, piyasa } from './core/market.js';
 import * as H from './core/hesap.js';
 import { $, $$, eylemleriBagla, eylemKaydet, bildir, modalAc, formOku, alan, girdi, notKutu, dosem } from './core/ui.js';
@@ -45,6 +47,11 @@ function temaUygula() {
   const m = document.querySelector('meta[name="theme-color"]');
   if (m) m.content = durum.ayarlar.tema === 'acik' ? '#f5f7fb' : '#070b14';
 }
+
+eylemKaydet('kilitle', () => {
+  Kilit.kilitle();
+  location.reload();
+});
 
 eylemKaydet('tema-degis', () => {
   durum.ayarlar.tema = durum.ayarlar.tema === 'acik' ? 'koyu' : 'acik';
@@ -99,6 +106,13 @@ function menuCiz() {
     const a = alt.querySelector('.aktif');
     if (a) a.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
   }
+
+  // kilit kuruluysa hızlı kilitleme düğmesi göster
+  const kurulu = Kilit.kilitKurulu();
+  ['#kilitDugme', '#kilitDugmeMobil'].forEach(sec => {
+    const d = $(sec);
+    if (d) d.classList.toggle('gizle', !kurulu);
+  });
 }
 
 /** Menüde dikkat çekmesi gereken sayılar (gecikmiş ödeme gibi). */
@@ -276,6 +290,14 @@ async function baslat() {
   icerikKok = $('#icerik');
   temaUygula();
   eylemleriBagla(document.body);
+
+  // Kilit kuruluysa uygulama açılmadan önce şifre istenir.
+  if (Kilit.kilitKurulu()) {
+    let veri = await Kilit.oturumdanAc();      // sekme oturumu varsa şifre sorulmaz
+    if (!veri) veri = await kilitEkraniGoster(); // yoksa şifre panelini bekle
+    durumuDegistir(veri);
+    temaUygula();
+  }
 
   const h = location.hash.slice(1);
   if (h && HARITA[h]) aktif = h;
