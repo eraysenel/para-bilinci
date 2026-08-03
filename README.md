@@ -140,7 +140,8 @@ assets/js/
     fmt.js                  Türkçe sayı/tarih biçimlendirme ve ayrıştırma
     ui.js                   modal, bildirim, form parçaları, olay yönlendirme
     sabitler.js             kategori ve tür listeleri
-  views/                    11 ekran
+    kilit.js                WebCrypto ile şifreli saklama (PBKDF2 + AES-GCM)
+  views/                    11 ekran + kilit ekranı
 data/
   referans.json             doğrulanmış resmî veriler (kaynak + tarih ile)
   mufredat.json             Para 101 müfredatı
@@ -149,11 +150,36 @@ worker/piyasa-proxy.js      Cloudflare Worker — BIST 100 için
 
 Harici kütüphane, CDN, derleme aracı ve paket bağımlılığı yoktur.
 
-## Gizlilik
+## Gizlilik ve kilit
 
 Tüm veriler tarayıcının `localStorage` alanında durur ve **hiçbir sunucuya gönderilmez**.
 Site yalnızca piyasa fiyatı çekmek için dışarı istek yapar; bu isteklerde senin verinden
 hiçbir şey taşınmaz. Hesap yok, giriş yok, çerez yok, analitik yok.
+
+### Kilit (kullanıcı adı + şifre)
+
+Ayarlar'dan bir kullanıcı adı ve şifre belirleyebilirsin. Bu bir hesap değildir —
+sunucuya kayıt olmazsın. Şifre, verini **gerçekten şifrelemek** için kullanılır:
+
+| | |
+|---|---|
+| Anahtar türetme | PBKDF2-SHA256, 250.000 tur, 16 baytlık rastgele tuz |
+| Şifreleme | AES-GCM 256 bit, her yazmada yeni rastgele IV |
+| Anahtarın saklandığı yer | Bellek; istenirse sekme ömrü boyunca `sessionStorage` — diske asla yazılmaz |
+
+Kilit kuruluyken `localStorage`'da okunabilir JSON yoktur, yalnızca şifrelenmiş blok vardır.
+Tarayıcı konsolunu açan biri de veriyi okuyamaz.
+
+> **Şifre sıfırlanamaz.** Sunucu yok, kurtarma anahtarı yok, "şifremi unuttum" e-postası yok.
+> Şifreyi unutursan veriler kalıcı olarak erişilemez hâle gelir. Kilidi kurmadan önce
+> mutlaka yedek indir.
+
+Yedek dosyaları bilerek **şifresiz** indirilir — kurtarma yolu olarak işe yaraması için.
+Yedeğini güvenli bir yerde tut.
+
+Kilit tarayıcının WebCrypto API'sini kullanır; bu da sayfanın **https** ya da **localhost**
+üzerinden açılmasını gerektirir. Desteklenmeyen ortamda kilit bölümü kendini devre dışı bırakır
+ve nedenini yazar.
 
 Verinin cihazda durması, tarayıcı verisi temizlendiğinde kaybolacağı anlamına gelir —
 Ayarlar ekranından düzenli yedek almak önerilir.

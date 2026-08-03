@@ -3,6 +3,7 @@
    Anahtar öneki pb2_ — eski sürümün (ao_*) verisine dokunulmaz. */
 
 import { kimlik, bugun } from './fmt.js';
+import * as Kilit from './kilit.js';
 
 const ANAHTAR = 'pb2_durum';
 const SURUM = 1;
@@ -95,6 +96,8 @@ function derinBirlestir(varsayilan, gelen) {
 }
 
 function yukle() {
+  // Kilit kuruluysa veri şifrelidir; açılana kadar boş durumla beklenir.
+  if (Kilit.kilitKurulu()) return bosDurum();
   try {
     const ham = localStorage.getItem(ANAHTAR);
     if (!ham) return bosDurum();
@@ -107,6 +110,19 @@ function yukle() {
 
 export const durum = yukle();
 
+/** Kilit kuruluysa ve henüz açılmadıysa true. */
+export function kilitliMi() { return Kilit.kilitKurulu() && !Kilit.acikMi(); }
+
+/**
+ * Çözülmüş (ya da yedekten gelen) durumu yerine koyar.
+ * `durum` referansı korunur; tüm modüller aynı nesneyi görmeye devam eder.
+ */
+export function durumuDegistir(yeni) {
+  const temiz = derinBirlestir(bosDurum(), yeni || {});
+  Object.keys(durum).forEach(k => delete durum[k]);
+  Object.assign(durum, temiz);
+}
+
 const dinleyiciler = new Set();
 let yazmaZaman = null;
 
@@ -115,6 +131,16 @@ export function kaydet(sebep = '') {
   durum.guncelleme = Date.now();
   clearTimeout(yazmaZaman);
   yazmaZaman = setTimeout(() => {
+    // Kilit açıksa şifreli yazılır; düz metin kayıt hiç oluşmaz.
+    if (Kilit.acikMi()) {
+      Kilit.sifreliYaz(durum).catch(e => {
+        console.error('Şifreli kayıt başarısız.', e);
+        yayinla('depolama-hatasi', e);
+      });
+      return;
+    }
+    // Kilit kurulu ama açık değilse yazma — şifreli veriyi ezmeyelim.
+    if (Kilit.kilitKurulu()) return;
     try {
       localStorage.setItem(ANAHTAR, JSON.stringify(durum));
     } catch (e) {
@@ -199,12 +225,13 @@ export function yedekYukle(metin) {
   kaydet('yedek-yukle');
 }
 
-/** Tüm veriyi siler. */
+/** Tüm veriyi siler (kilit kaydı dahil). */
 export function hepsiniSil() {
   const yeni = bosDurum();
   Object.keys(durum).forEach(k => delete durum[k]);
   Object.assign(durum, yeni);
   try { localStorage.removeItem(ANAHTAR); } catch {}
+  Kilit.kayitSil();
   kaydet('sifirla');
 }
 
