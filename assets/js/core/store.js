@@ -40,10 +40,12 @@ export function bosDurum() {
     notlar: [],     // {id, tarih, metin}
 
     piyasa: {
-      onbellek: null,          // son başarılı çekim {zaman, veri, kaynaklar}
-      elle: {},                // kullanıcının elle girdiği değerler {usd, eur, gramAltin, bist}
+      onbellek: null,          // son başarılı çekim {zaman, veri}
+      elle: {},                // kullanıcının elle girdiği değerler
       proxyUrl: '',            // isteğe bağlı Cloudflare Worker adresi
-      otomatikCek: true
+      otomatikCek: true,
+      // ücretsiz kaynakları yormamak için istek freni (bkz. market.js)
+      fren: { gun: null, sayac: 0, sonDeneme: 0, hataAdedi: 0 }
     },
 
     ayarlar: {
@@ -216,6 +218,6 @@ export function eskiVeriVar() {
 
 /** Eski sürümün anahtarlarını siler (kullanıcı onayıyla çağrılır). */
 export function eskiVeriSil() {
-  ['ao_items', 'ao_exp', 'ao_sells', 'ao_debts', 'ao_settings', 'cf_ses']
+  ['ao_items', 'ao_exp', 'ao_sells', 'ao_debts', 'ao_settings', 'cf_ses', 'pb2_ai_oturum']
     .forEach(k => { try { localStorage.removeItem(k); } catch {} });
 }

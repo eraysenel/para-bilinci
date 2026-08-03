@@ -497,12 +497,23 @@ table.veri .dar { width: 1%; white-space: nowrap; }
 .halka svg { transform: rotate(-90deg); }
 .halka .yz { position: absolute; inset: 0; display: grid; place-items: center; font-size: 10.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
 
-/* ---------- 20. Sohbet ---------- */
-.sohbet { display: flex; flex-direction: column; gap: 10px; max-height: 460px; overflow-y: auto; padding: 4px 2px; }
-.balon { max-width: 86%; padding: 10px 14px; border-radius: 15px; font-size: 14px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
-.balon.ben { align-self: flex-end; background: var(--surface-3); border-bottom-right-radius: 5px; }
-.balon.ai  { align-self: flex-start; background: var(--gold-dim); border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent); border-bottom-left-radius: 5px; }
-.balon.hata{ align-self: flex-start; background: var(--red-dim); border: 1px solid color-mix(in srgb, var(--red) 26%, transparent); }
+/* ---------- 20. Kaynak dipnotu (göze batmayan) ---------- */
+.kaynak-dip {
+  margin: 22px 0 4px;
+  padding: 10px 13px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 10.5px; line-height: 1.6; color: var(--faint);
+}
+.kaynak-dip b { color: var(--muted); font-weight: 600; }
+.kaynak-dip a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--line); }
+.kaynak-dip a:hover { color: var(--gold); text-decoration: none; }
+.kaynak-dip .ayir { opacity: .45; margin: 0 5px; }
+.kaynak-dip details { display: inline; }
+.kaynak-dip summary { display: inline; cursor: pointer; color: var(--muted); border-bottom: 1px dotted var(--line); }
+.kaynak-dip summary::-webkit-details-marker { display: none; }
+.kaynak-dip details[open] > summary { color: var(--gold); }
+.kaynak-dip .detay { margin-top: 7px; padding-left: 2px; }
+.kaynak-dip .detay div { margin-bottom: 2px; }
 
 /* ---------- 21. Yardımcılar ---------- */
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }

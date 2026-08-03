@@ -691,6 +691,7 @@ export function varlikDegerleme(piyasa) {
     else if (v.tur === 'usd') { birimFiyat = piyasa.usd.deger; kaynak = piyasa.usd.kaynak; }
     else if (v.tur === 'eur') { birimFiyat = piyasa.eur.deger; kaynak = piyasa.eur.kaynak; }
     else if (v.tur === 'altin') { birimFiyat = piyasa.gramAltin.deger; kaynak = piyasa.gramAltin.kaynak; }
+    else if (v.tur === 'gumus') { birimFiyat = piyasa.gramGumus.deger; kaynak = piyasa.gramGumus.kaynak; }
     else if (v.birimFiyat) { birimFiyat = Number(v.birimFiyat); kaynak = 'elle girildi'; }
 
     const guncelDeger = birimFiyat !== null ? miktar * birimFiyat : null;
@@ -718,8 +719,15 @@ export function varlikDegerleme(piyasa) {
   };
 }
 
-const GRUP_ADI = { tl: 'TL / Mevduat', mevduat: 'TL / Mevduat', usd: 'Döviz', eur: 'Döviz', altin: 'Altın', hisse: 'Hisse / Fon', fon: 'Hisse / Fon', diger: 'Diğer' };
-const HEDEF_ANAHTAR = { 'TL / Mevduat': 'tl', 'Döviz': 'doviz', 'Altın': 'altin', 'Hisse / Fon': 'hisse' };
+const GRUP_ADI = {
+  tl: 'TL / Mevduat', mevduat: 'TL / Mevduat',
+  usd: 'Döviz', eur: 'Döviz',
+  altin: 'Kıymetli maden', gumus: 'Kıymetli maden',
+  hisse: 'Hisse / Fon', fon: 'Hisse / Fon', diger: 'Diğer'
+};
+// hedefDagilim anahtarı geriye dönük uyumluluk için 'altin' kalır; artık gümüşü de kapsar
+const HEDEF_ANAHTAR = { 'TL / Mevduat': 'tl', 'Döviz': 'doviz', 'Kıymetli maden': 'altin', 'Hisse / Fon': 'hisse' };
+const HEDEF_ETIKET = { tl: 'TL / Mevduat', doviz: 'Döviz', altin: 'Kıymetli maden', hisse: 'Hisse / Fon' };
 
 /** Mevcut dağılım ile hedef dağılım arasındaki sapma. */
 export function dagilimSapmasi(degerleme) {
@@ -737,7 +745,7 @@ export function dagilimSapmasi(degerleme) {
     const m = mevcut[a] || 0, h = Number(hedef[a]) || 0;
     return {
       anahtar: a,
-      ad: { tl: 'TL / Mevduat', doviz: 'Döviz', altin: 'Altın', hisse: 'Hisse / Fon' }[a] || a,
+      ad: HEDEF_ETIKET[a] || a,
       mevcut: m, hedef: h, sapma: m - h,
       tutarFarki: (h - m) / 100 * toplam
     };
@@ -935,62 +943,4 @@ export function alimEtkisi(fiyat) {
       return af.yeterliVeri && af.hedef > 0 ? fiyat / af.hedef * 100 : null;
     })()
   };
-}
-
-/* ============================================================
-   14. AI mentor için bağlam özeti
-   ============================================================ */
-
-export function aiBaglam(piyasa) {
-  const p = [];
-  const h = durum.hane;
-  const kisi = haneKisi();
-
-  p.push(`HANE: ${h.yetiskin} yetişkin, ${h.cocuk} çocuk` +
-    (Number(h.bakmaklaYukumlu) > 0 ? `, ayrıca ${h.bakmaklaYukumlu} kişiye daha bakıyor` : '') +
-    `; toplam ${kisi} kişi. Haneye gelir getiren kişi sayısı: ${h.gelirSayisi}.`);
-
-  const g = aylikGelir(), s = aylikSabit(), by = aylikBorcYuku();
-  p.push(`AYLIK: net gelir ${Math.round(g)} ₺, sabit gider ${Math.round(s)} ₺, borç/taksit yükü ${Math.round(by)} ₺.`);
-
-  const nakit = Number(durum.nakit.tutar) || 0;
-  const gg = gunlukGuvenli();
-  p.push(`NAKİT: elde ${Math.round(nakit)} ₺. Bir sonraki gelire kadar (${gg.gun} gün) ödenecek yükümlülük ${Math.round(gg.rezerve)} ₺, serbest ${Math.round(gg.serbest)} ₺, güvenli günlük ${Math.round(gg.gunluk)} ₺.`);
-
-  const kd = kategoriDagilim();
-  if (kd.length) p.push(`BU AY HARCAMA: toplam ${Math.round(ayToplamHarcama())} ₺ — ` +
-    kd.slice(0, 6).map(k => `${k.ad} ${Math.round(k.deger)} ₺`).join(', ') + '.');
-
-  if (durum.borclar.length) {
-    p.push('BORÇLAR: ' + durum.borclar.filter(b => (b.kalan || 0) > 0).map(b => {
-      const f = b.tur === 'kk' ? kartFaizi(b) : aylikFaizden(b);
-      return `${b.ad} (${b.tur}) kalan ${Math.round(b.kalan)} ₺${f ? `, aylık faiz %${f}` : ''}` +
-        (b.tur === 'kk' && b.limit ? `, limit ${Math.round(b.limit)} ₺` : '');
-    }).join('; ') + '.');
-  }
-
-  const af = acilFonDurumu();
-  if (af.yeterliVeri) p.push(`ACİL FON: hedef ${Math.round(af.hedef)} ₺ (${af.hedefAy.ay} aylık zorunlu gider), biriken ${Math.round(af.biriken)} ₺.`);
-
-  const bg = borcGelirOrani();
-  if (bg) p.push(`BORÇ/GELİR ORANI: %${bg.oran.toFixed(0)} — ${bg.durumAdi}.`);
-
-  const skor = [...durum.skorlar].sort((a, b) => b.tarih.localeCompare(a.tarih))[0];
-  if (skor) p.push(`KREDİ NOTU: ${skor.skor} (${skorKademesi(skor.skor)?.ad || '—'}), ${skor.tarih} tarihli.`);
-
-  if (REFERANS) {
-    p.push(`RESMİ VERİ (${REFERANS.tufe.donemAdi}): TÜİK yıllık TÜFE %${REFERANS.tufe.yillik}, aylık %${REFERANS.tufe.aylik}. ENAG yıllık %${REFERANS.enag.yillik}. TCMB politika faizi %${REFERANS.faiz.politikaFaizi.yillikYuzde}.`);
-  }
-  if (piyasa && piyasa.usd.deger) {
-    p.push(`PİYASA: USD/TRY ${piyasa.usd.deger.toFixed(2)}` +
-      (piyasa.gramAltin.deger ? `, gram altın ${Math.round(piyasa.gramAltin.deger)} ₺` : '') +
-      (piyasa.bist.deger ? `, BIST 100 ${Math.round(piyasa.bist.deger)}` : '') + '.');
-  }
-
-  const ke = kisiselEnflasyon();
-  if (ke.yeterliVeri && ke.toplamDegisim !== null) {
-    p.push(`KİŞİSEL SEPET: ${ke.urunSayisi} ürün, ${ke.gunOrt} günde toplam değişim %${ke.toplamDegisim.toFixed(1)}.`);
-  }
-
-  return p.join('\n');
 }

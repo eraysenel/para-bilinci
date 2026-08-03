@@ -101,7 +101,7 @@ function varlikListesi(d) {
   if (!d.satirlar.length) {
     return kart('Varlıkların', bos(
       'Varlık eklenmedi',
-      'Dövizini, altınını, mevduatını ve fonlarını gir. Güncel fiyatlarla değerlenip dağılımın çıkarılır.', '◭'
+      'Dövizini, altınını, gümüşünü, mevduatını ve fonlarını gir. Güncel fiyatlarla değerlenip dağılımın çıkarılır.', '◭'
     ) + `<div class="merkez ust-12"><button class="dg-btn b-ana b-kucuk" data-eylem="varlik-ekle">＋ Varlık ekle</button></div>`,
       { ikon: '◭' });
   }
@@ -112,7 +112,7 @@ function varlikListesi(d) {
       <div class="gvd">
         <div class="ad">${kac(s.ad || (VARLIK_TURLER.find(t => t.deger === s.tur) || {}).ad || s.tur)}</div>
         <div class="ayr">
-          ${n(s.miktar, s.tur === 'altin' ? 2 : 0)} ${kac(VARLIK_BIRIM[s.tur] || '')}
+          ${n(s.miktar, s.tur === 'altin' ? 2 : s.tur === 'gumus' ? 1 : 0)} ${kac(VARLIK_BIRIM[s.tur] || '')}
           ${s.birimFiyat !== null ? ` × ${n(s.birimFiyat, 2)} ₺` : ' · <span class="r-amber">güncel fiyat bilinmiyor</span>'}
           ${s.alisFiyat ? ` · alış ${n(s.alisFiyat, 2)} ₺` : ''}
           ${s.alisTarih ? ` · ${tarihKisa(s.alisTarih)}` : ''}
@@ -281,7 +281,7 @@ function varlikFormu(v = null) {
         ${alan('Alış tarihi', girdi('alisTarih', { tur: 'date', deger: v?.alisTarih || '' }))}
         ${alan('Güncel birim fiyat (₺)', girdi('birimFiyat', { deger: v?.birimFiyat || '', yer: 'otomatik çekilemezse' }), 'hisse/fon için')}
       </div>
-      ${notKutu('bilgi', `Dolar, euro ve gram altın için güncel fiyat otomatik çekilir.
+      ${notKutu('bilgi', `Dolar, euro, gram altın ve gram gümüş için güncel fiyat otomatik çekilir.
         Hisse ve fonlarda birim fiyatı elle girmen gerekir — canlı borsa verisi için Ayarlar'dan Worker adresini tanımlayabilirsin.`)}`,
     dugmeler: [
       { ad: 'Vazgeç', sinif: 'b-cizgi' },
@@ -324,7 +324,7 @@ eylemKaydet('hedef-dagilim', () => {
         ${alan('Döviz (%)', girdi('doviz', { tur: 'number', deger: h.doviz, ek: 'min="0" max="100"' }))}
       </div>
       <div class="satir s-2">
-        ${alan('Altın (%)', girdi('altin', { tur: 'number', deger: h.altin, ek: 'min="0" max="100"' }))}
+        ${alan('Kıymetli maden (%)', girdi('altin', { tur: 'number', deger: h.altin, ek: 'min="0" max="100"' }), 'altın + gümüş')}
         ${alan('Hisse / Fon (%)', girdi('hisse', { tur: 'number', deger: h.hisse, ek: 'min="0" max="100"' }))}
       </div>
       ${notKutu('uyari', 'Bu araç sana bir dağılım önermez — kimse senin risk tahammülünü ve zaman ufkunu senden iyi bilemez. Burası senin planını yazdığın yer.')}`,

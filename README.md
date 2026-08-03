@@ -25,6 +25,26 @@ Eksi olmak, borçlu olmak sorun değil — görülmeyen para sorundur.
 - Elle girilen piyasa değerleri `elle girildi` rozetiyle işaretlenir, canlı veriyle karıştırılmaz.
 - Gelecek getirisi hakkında sayı üretilmez.
 
+## İkinci ilke: sıfır maliyet
+
+Site hiçbir ücretli servise bağlanmaz. Kullanılan tüm canlı veri kaynakları ücretsiz ve
+API anahtarı gerektirmez; reklam, analitik ve takip kodu yoktur. Barındırma GitHub Pages'te
+statik dosya sunumundan ibarettir.
+
+Ücretsiz kaynakları yormamak için tarayıcı tarafında bir istek freni vardır:
+
+| Fren | Değer |
+|---|---|
+| Önbellek ömrü (bu süre içinde ağa çıkılmaz) | 30 dk |
+| Ardışık ağ denemesi arasındaki alt sınır | 10 dk |
+| Elle yenilemede alt sınır | 60 sn |
+| Hata sonrası artan bekleme | 1 → 5 → 15 → 60 dk |
+| Günlük istek üst sınırı (cihaz başına) | 24 |
+
+Kur kaynakları günde bir güncellendiği için bu sıklık fazlasıyla yeterlidir.
+Worker proxy kullanılıyorsa yanıtlar ayrıca Cloudflare kenar önbelleğinde 5 dakika tutulur —
+kaç kullanıcı olursa olsun upstream'e dakikada birden fazla istek gitmez.
+
 ## Ekranlar
 
 | Ekran | Ne yapar |
@@ -39,7 +59,6 @@ Eksi olmak, borçlu olmak sorun değil — görülmeyen para sorundur.
 | **Mutfak** | Porsiyon maliyeti, evde vs dışarıda yıllık fark |
 | **Kredi Skoru** | Findeks notu takibi, limit kullanım oranı, kişiselleştirilmiş eylem listesi |
 | **Para 101** | 8 modül / 27 ders — temelden yatırıma, her dersin sonunda tek bir eylem |
-| **AI Mentor** | Verilerin özetiyle kişisel yorum (Cloudflare Worker üzerinden) |
 
 ### Öne çıkan hesaplar
 
@@ -75,19 +94,22 @@ Bilinmeyen değerler `null` bırakılır ve arayüzde `—` görünür.
 
 ### Canlı piyasa verisi
 
+Hepsi ücretsiz ve anahtarsızdır.
+
 | Veri | Kaynak | Tarayıcıdan doğrudan? |
 |---|---|---|
 | USD/TRY, EUR/TRY | open.er-api.com → frankfurter.app (ECB) | ✅ CORS açık |
-| Ons altın (USD) | gold-api.com | ✅ CORS açık |
-| Gram altın (₺) | ons × USD/TRY ÷ 31,1035 ile hesaplanır | ✅ türetilir |
+| Ons altın (XAU), ons gümüş (XAG) | gold-api.com | ✅ CORS açık |
+| Gram altın / gram gümüş (₺) | ons × USD/TRY ÷ 31,1035 ile hesaplanır | ✅ türetilir |
 | BIST 100 | Yahoo Finance / Stooq | ❌ **proxy gerekir** |
 
 BIST 100 için araya bir sunucu girmesi gerekiyor: Yahoo Finance, Stooq ve TCMB tarayıcıdan
 gelen isteklere CORS başlığı döndürmez. Hazır Worker kodu depoda:
 
-**`worker/piyasa-proxy.js`** — mevcut AI danışman Worker'ına eklenebilir ya da ayrı
-yayınlanabilir. Kurulum adımları dosyanın başında yazılı. Yayınladıktan sonra adresi
-uygulamada **Ayarlar → Canlı piyasa verisi → Cloudflare Worker adresi** alanına gir.
+**`worker/piyasa-proxy.js`** — mevcut bir Worker'a eklenebilir ya da ayrı yayınlanabilir
+(Cloudflare'in ücretsiz planı fazlasıyla yeter). Kurulum adımları dosyanın başında yazılı.
+Yayınladıktan sonra adresi uygulamada
+**Ayarlar → Canlı piyasa verisi → Cloudflare Worker adresi** alanına gir.
 
 Proxy olmadan da her şey çalışır; BIST ve istenirse diğer değerler elle girilebilir.
 
@@ -118,7 +140,7 @@ assets/js/
     fmt.js                  Türkçe sayı/tarih biçimlendirme ve ayrıştırma
     ui.js                   modal, bildirim, form parçaları, olay yönlendirme
     sabitler.js             kategori ve tür listeleri
-  views/                    12 ekran
+  views/                    11 ekran
 data/
   referans.json             doğrulanmış resmî veriler (kaynak + tarih ile)
   mufredat.json             Para 101 müfredatı
@@ -129,10 +151,9 @@ Harici kütüphane, CDN, derleme aracı ve paket bağımlılığı yoktur.
 
 ## Gizlilik
 
-Tüm veriler tarayıcının `localStorage` alanında durur ve hiçbir sunucuya gönderilmez.
-Tek istisna **AI Mentor**: soru sorulduğunda finansal durumun bir **özeti** gönderilir
-(tek tek harcamalar, tarihler ve isimler değil). Gönderilen metnin tamamı,
-AI Mentor ekranındaki *"Gönderilen özeti gör"* düğmesiyle görüntülenebilir.
+Tüm veriler tarayıcının `localStorage` alanında durur ve **hiçbir sunucuya gönderilmez**.
+Site yalnızca piyasa fiyatı çekmek için dışarı istek yapar; bu isteklerde senin verinden
+hiçbir şey taşınmaz. Hesap yok, giriş yok, çerez yok, analitik yok.
 
 Verinin cihazda durması, tarayıcı verisi temizlendiğinde kaybolacağı anlamına gelir —
 Ayarlar ekranından düzenli yedek almak önerilir.

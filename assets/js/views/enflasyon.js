@@ -41,10 +41,10 @@ function resmiKart() {
       onu da ancak <b>kendi sepetini ölçerek</b> öğrenirsin.`)}
 
     <div class="mini r-faint ust-8">
-      Kaynaklar: <a href="${kac(t.kaynakUrl)}" target="_blank" rel="noopener">${kac(t.kaynak)} ↗</a> ·
-      <a href="${kac(e.kaynakUrl)}" target="_blank" rel="noopener">${kac(e.kaynak)} ↗</a><br>
-      Veri seti ${kac(ref.guncellemeTarihi)} tarihinde güncellendi. Sonraki beklenen güncelleme: ${kac(ref.sonrakiBeklenenGuncelleme)}.
-      Bu sayılar uygulamaya elle işlenir; tahmin veya modelleme içermez.
+      <a href="${kac(t.kaynakUrl)}" target="_blank" rel="noopener">${kac(t.kaynak)} ↗</a>
+      · <a href="${kac(e.kaynakUrl)}" target="_blank" rel="noopener">${kac(e.kaynak)} ↗</a>
+      · veri seti ${kac(ref.guncellemeTarihi)} tarihinde güncellendi, sonraki ${kac(ref.sonrakiBeklenenGuncelleme)}
+      · resmî bültenlerden elle işlenir, tahmin veya modelleme içermez
     </div>`, { ikon: '◈', yan: kac(t.donemAdi) });
 }
 
@@ -175,10 +175,11 @@ function gruplarKart() {
       bilinen.map(g => ({ ad: g.ad, deger: g.yillik })).sort((a, b) => b.deger - a.deger),
       { bicim: v => yuzde(v, 1) })}</div>` : ''}
 
-    ${bilinmeyen.length ? `<div class="ust-12">${notKutu('notr',
-      `<b>${bilinmeyen.length} grubun verisi bu veri setinde yok</b> ve tablo "—" gösteriyor.
-       Bilmediğimiz bir sayıyı tahmin etmektense boş bırakmayı tercih ediyoruz.
-       Eksik değerler TÜİK bülteninden okunup <code>data/referans.json</code> dosyasına eklenebilir.`)}</div>` : ''}
+    ${bilinmeyen.length ? `<div class="mini r-faint ust-12">
+      ${bilinmeyen.length} grubun verisi bu veri setinde yok, tablo “—” gösteriyor —
+      bilmediğimiz bir sayıyı tahmin etmektense boş bırakıyoruz.
+      Eksik değerler TÜİK bülteninden okunup <code>data/referans.json</code> dosyasına eklenebilir.
+    </div>` : ''}
 
     <div class="ust-12">${notKutu('bilgi',
       `Kırmızı satırlar genel enflasyondan (%${n(ref.tufe.yillik, 2)}) daha hızlı artan gruplardır.
