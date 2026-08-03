@@ -1,0 +1,97 @@
+{
+  "_aciklama": "Para Bilinci referans veri seti. BURAYA SADECE RESMI KAYNAKTAN DOGRULANMIS SAYILAR YAZILIR. Bilinmeyen deger 'null' birakilir; uygulama null degerleri '-' olarak gosterir, asla tahmin uretmez.",
+  "guncellemeTarihi": "2026-08-03",
+  "sonrakiBeklenenGuncelleme": "2026-09-03",
+
+  "tufe": {
+    "kaynak": "TUIK Tuketici Fiyat Endeksi",
+    "kaynakUrl": "https://data.tuik.gov.tr/Kategori/GetKategori?p=enflasyon-ve-fiyat-106",
+    "donem": "2026-07",
+    "donemAdi": "Temmuz 2026",
+    "aylik": 1.78,
+    "yillik": 31.75,
+    "onikiAylikOrtalama": 31.90,
+    "yilbasindanBeri": 19.86,
+    "gruplar": [
+      { "ad": "Gıda ve alkolsüz içecekler",           "kod": "gida",        "aylik": 1.61,  "yillik": 37.53, "katkiPuan": 8.94 },
+      { "ad": "Konut, su, elektrik, gaz ve yakıtlar",  "kod": "konut",       "aylik": 2.25,  "yillik": 40.32, "katkiPuan": 5.21 },
+      { "ad": "Ulaştırma",                             "kod": "ulasim",      "aylik": 2.59,  "yillik": 30.83, "katkiPuan": 5.22 },
+      { "ad": "Sağlık",                                "kod": "saglik",      "aylik": 10.74, "yillik": 43.89, "katkiPuan": null },
+      { "ad": "Eğitim",                                "kod": "egitim",      "aylik": null,  "yillik": 44.18, "katkiPuan": null },
+      { "ad": "Lokanta ve oteller",                    "kod": "lokanta",     "aylik": 2.28,  "yillik": 31.65, "katkiPuan": null },
+      { "ad": "Alkollü içecekler ve tütün",            "kod": "tutun",       "aylik": null,  "yillik": 29.38, "katkiPuan": null },
+      { "ad": "Giyim ve ayakkabı",                     "kod": "giyim",       "aylik": -3.93, "yillik": null,  "katkiPuan": null },
+      { "ad": "Mobilya ve ev eşyası",                  "kod": "evesyasi",    "aylik": null,  "yillik": null,  "katkiPuan": null },
+      { "ad": "Haberleşme",                            "kod": "haberlesme",  "aylik": null,  "yillik": null,  "katkiPuan": null },
+      { "ad": "Eğlence ve kültür",                     "kod": "eglence",     "aylik": null,  "yillik": null,  "katkiPuan": null },
+      { "ad": "Çeşitli mal ve hizmetler",              "kod": "cesitli",     "aylik": null,  "yillik": null,  "katkiPuan": null }
+    ]
+  },
+
+  "enag": {
+    "kaynak": "ENAG - Enflasyon Araştırma Grubu (bağımsız, resmî değildir)",
+    "kaynakUrl": "https://enagrup.org/",
+    "donem": "2026-07",
+    "donemAdi": "Temmuz 2026",
+    "aylik": 3.07,
+    "yillik": 50.49,
+    "oncekiDonem": { "donem": "2026-06", "aylik": 1.94, "yillik": 51.49 }
+  },
+
+  "faiz": {
+    "politikaFaizi": {
+      "kaynak": "TCMB - 1 hafta vadeli repo ihale faiz oranı",
+      "kaynakUrl": "https://www.tcmb.gov.tr/wps/wcm/connect/tr/tcmb+tr/main+menu/temel+faaliyetler/para+politikasi/merkez+bankasi+faiz+oranlari",
+      "gecerlilik": "2026-07",
+      "yillikYuzde": 37.0
+    },
+    "krediKarti": {
+      "kaynak": "TCMB - Kredi Kartı İşlemlerinde Uygulanacak Azami Faiz Oranları",
+      "kaynakUrl": "https://www.tcmb.gov.tr/wps/wcm/connect/TR/TCMB+TR/Main+Menu/Istatistikler/Bankacilik+Verileri/Kredi_Karti_Islemlerinde_Uygulanacak_Azami_Faiz_Oranlari",
+      "yururlukTarihi": "2026-01-01",
+      "not": "TCMB bu oranları her ayın sondan beşinci iş günü ilan eder. Bunlar AZAMİ oranlardır; bankan daha düşük uygulayabilir. Kendi ekstrende yazan oranı Ayarlar'dan gir.",
+      "kademeler": [
+        { "altSinir": 0,      "ustSinir": 30000,  "akdiAylik": 3.25, "gecikmeAylik": 3.55 },
+        { "altSinir": 30000,  "ustSinir": 180000, "akdiAylik": 3.75, "gecikmeAylik": 4.05 },
+        { "altSinir": 180000, "ustSinir": null,   "akdiAylik": 4.25, "gecikmeAylik": 4.55 }
+      ],
+      "nakitAvansAylik": 4.25
+    },
+    "asgariOdeme": {
+      "kaynak": "BDDK kredi kartı asgari ödeme oranı düzenlemesi",
+      "not": "Asgari ödeme oranı kart LİMİTİNE göre belirlenir, dönem borcuna göre değil.",
+      "kademeler": [
+        { "limitUst": 50000, "oran": 20 },
+        { "limitUst": null,  "oran": 40 }
+      ],
+      "uyari": "Bir takvim yılı içinde üç kez asgari tutarın altında ödeme yapılırsa kart nakit çekime ve limit artırımına kapatılır; borcun tamamı ödenene kadar bu kısıt sürer."
+    }
+  },
+
+  "krediSkoru": {
+    "kaynak": "Findeks / KKB kredi notu",
+    "kaynakUrl": "https://www.findeks.com/",
+    "not": "Findeks'in herkese açık bir API'si yoktur; skor otomatik çekilemez. Skorunu Findeks'ten öğrenip buraya elle girersin.",
+    "aralik": { "min": 1, "max": 1900 },
+    "kademeler": [
+      { "ad": "Çok riskli",  "min": 1,    "max": 699,  "renk": "kritik" },
+      { "ad": "Orta riskli", "min": 700,  "max": 1099, "renk": "uyari" },
+      { "ad": "Az riskli",   "min": 1100, "max": 1499, "renk": "notr" },
+      { "ad": "İyi",         "min": 1500, "max": 1699, "renk": "iyi" },
+      { "ad": "Çok iyi",     "min": 1700, "max": 1900, "renk": "cokiyi" }
+    ],
+    "bilesenler": [
+      { "ad": "Ödeme geçmişi",       "agirlik": 45, "aciklama": "Borçlarını zamanında ödemen. En ağır bileşen. Tek bir gecikme bile uzun süre iz bırakır." },
+      { "ad": "Mevcut hesap durumu", "agirlik": 22, "aciklama": "Açık kredilerinin ve kartlarının bugünkü durumu; gecikmede olan hesabın var mı." },
+      { "ad": "Kredi kullanım yoğunluğu", "agirlik": 18, "aciklama": "Kart limitinin ne kadarını kullandığın. %30'un altında tutmak skoru destekler." },
+      { "ad": "Yeni kredi/kart başvuruları", "agirlik": 8, "aciklama": "Kısa sürede çok sayıda başvuru risk sinyali sayılır." },
+      { "ad": "Kredi geçmişi uzunluğu", "agirlik": 7, "aciklama": "Ne kadar süredir düzenli ürün kullandığın. Eski kartını kapatmak geçmişini kısaltabilir." }
+    ]
+  },
+
+  "altin": {
+    "gramOns": 31.1034768,
+    "milyemAyar": { "24": 1.0, "22": 0.916, "18": 0.750, "14": 0.585 },
+    "not": "Gram altın (TL) = ONS altın (USD) × USD/TRY ÷ 31,1034768. Uygulama bu formülü kullanır."
+  }
+}
