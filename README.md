@@ -158,7 +158,7 @@ assets/js/
     ui.js                   modal, bildirim, form parçaları, olay yönlendirme
     sabitler.js             kategori ve tür listeleri
     kilit.js                WebCrypto ile şifreli saklama (PBKDF2 + AES-GCM)
-  views/                    11 ekran + kilit ekranı
+  views/                    12 ekran (Gizlilik & KVKK dahil) + kilit ekranı
 data/
   referans.json             doğrulanmış resmî veriler (kaynak + tarih ile)
   mufredat.json             Para 101 müfredatı
@@ -167,11 +167,47 @@ worker/piyasa-proxy.js      Cloudflare Worker — BIST 100 için
 
 Harici kütüphane, CDN, derleme aracı ve paket bağımlılığı yoktur.
 
-## Gizlilik ve kilit
+## Gizlilik, KVKK ve kilit
 
 Tüm veriler tarayıcının `localStorage` alanında durur ve **hiçbir sunucuya gönderilmez**.
 Site yalnızca piyasa fiyatı çekmek için dışarı istek yapar; bu isteklerde senin verinden
 hiçbir şey taşınmaz. Hesap yok, giriş yok, çerez yok, analitik yok.
+
+Uygulama içinde **Gizlilik & KVKK** ekranı vardır (`assets/js/views/gizlilik.js`). Bu ekran
+bir vaat listesi değil, bir denetimdir:
+
+- **Cihazında ne duruyor** — canlı tablo, gerçek `localStorage`/`sessionStorage` içeriğini
+  ve boyutlarını okur. "Ham veriyi göster" ile her kayıt olduğu gibi görülebilir.
+- **Cihazından ne çıkıyor** — uygulamanın yaptığı *tüm* dış isteklerin listesi; her biri için
+  kimin işlettiği ve gizlilik politikası bağlantısı. IP adresinin üçüncü taraflara ulaştığı
+  açıkça yazılıdır.
+- **KVKK aydınlatma metni** — 6698 sayılı Kanun'un 10. maddesine göre yedi bölüm
+  (veri sorumlusu, işlenen veriler, amaç, hukuki sebep, aktarım, saklama süresi, otomatik karar).
+- **KVKK m. 11 hakları** — dokuz hak ve her birinin bu uygulamada *başvuru yapmadan* nasıl
+  kullanılacağı.
+- **Çerez politikası** — çerez kullanılmaz; `document.cookie` kaynak kodda hiç geçmez.
+
+### Doldurulması gereken alan
+
+KVKK, veri sorumlusunun kimliğini ve bir başvuru kanalını zorunlu kılar. Bu alanlar
+`data/referans.json` → `gizlilik` bölümündedir ve **bilerek boş bırakılmıştır**:
+
+```json
+"gizlilik": { "veriSorumlusu": "", "iletisimEposta": "", "iletisimAdres": "" }
+```
+
+Boş kaldığı sürece ekranda "bu metin henüz tamamlanmadı" uyarısı görünür. Kişisel iletişim
+bilgisinin yayımlanması proje sahibinin kararıdır.
+
+### Gizlilik iddiaları test edilir
+
+`Playwright` testi bir oturum boyunca **her ağ isteğini** yakalar ve şunları doğrular:
+beyan edilmemiş tek bir host'a çıkılmadığı, hiçbir isteğin gövde (POST verisi) taşımadığı,
+URL'lerde kişisel veri geçmediği, hiç çerez oluşmadığı ve gizlilik ekranındaki host
+listesinin koddaki gerçek çağrılarla birebir aynı olduğu.
+
+> Bu metin teknik gerçekleri anlatır; **hukuki mütalaa değildir**. Yayımlamadan önce bir
+> hukukçuya gözden geçirtmek önerilir.
 
 ### Kilit (kullanıcı adı + şifre)
 

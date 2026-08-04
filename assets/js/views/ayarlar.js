@@ -235,7 +235,8 @@ function hakkindaKart() {
       birlikte gösterilir, çekilemeyen veri "—" olarak kalır, projeksiyon içeren her hesap
       "senaryo" etiketiyle işaretlenir.
     </p>
-    <div class="ust-16 merkez">
+    <div class="dg-grup ust-16" style="justify-content:center">
+      <button class="dg-btn b-cizgi b-kucuk" data-eylem="git" data-hedef="gizlilik">⛨ Gizlilik & KVKK</button>
       <a class="dg-btn b-ana b-kucuk" href="https://eraysenel.github.io/iyilik-icin-ai/" target="_blank" rel="noopener">
         İyilik İçin Yapay Zekâ — tüm projeler ↗</a>
     </div>

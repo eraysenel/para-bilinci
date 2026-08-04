@@ -2,7 +2,6 @@
   "_aciklama": "Para Bilinci referans veri seti. BURAYA SADECE RESMI KAYNAKTAN DOGRULANMIS SAYILAR YAZILIR. Bilinmeyen deger 'null' birakilir; uygulama null degerleri '-' olarak gosterir, asla tahmin uretmez.",
   "guncellemeTarihi": "2026-08-03",
   "sonrakiBeklenenGuncelleme": "2026-09-03",
-
   "tufe": {
     "kaynak": "TUIK Tuketici Fiyat Endeksi",
     "kaynakUrl": "https://data.tuik.gov.tr/Kategori/GetKategori?p=enflasyon-ve-fiyat-106",
@@ -10,24 +9,95 @@
     "donemAdi": "Temmuz 2026",
     "aylik": 1.78,
     "yillik": 31.75,
-    "onikiAylikOrtalama": 31.90,
+    "onikiAylikOrtalama": 31.9,
     "yilbasindanBeri": 19.86,
     "gruplar": [
-      { "ad": "Gıda ve alkolsüz içecekler",           "kod": "gida",        "aylik": 1.61,  "yillik": 37.53, "katkiPuan": 8.94 },
-      { "ad": "Konut, su, elektrik, gaz ve yakıtlar",  "kod": "konut",       "aylik": 2.25,  "yillik": 40.32, "katkiPuan": 5.21 },
-      { "ad": "Ulaştırma",                             "kod": "ulasim",      "aylik": 2.59,  "yillik": 30.83, "katkiPuan": 5.22 },
-      { "ad": "Sağlık",                                "kod": "saglik",      "aylik": 10.74, "yillik": 43.89, "katkiPuan": null },
-      { "ad": "Eğitim",                                "kod": "egitim",      "aylik": null,  "yillik": 44.18, "katkiPuan": null },
-      { "ad": "Lokanta ve oteller",                    "kod": "lokanta",     "aylik": 2.28,  "yillik": 31.65, "katkiPuan": null },
-      { "ad": "Alkollü içecekler ve tütün",            "kod": "tutun",       "aylik": null,  "yillik": 29.38, "katkiPuan": null },
-      { "ad": "Giyim ve ayakkabı",                     "kod": "giyim",       "aylik": -3.93, "yillik": null,  "katkiPuan": null },
-      { "ad": "Mobilya ve ev eşyası",                  "kod": "evesyasi",    "aylik": null,  "yillik": null,  "katkiPuan": null },
-      { "ad": "Haberleşme",                            "kod": "haberlesme",  "aylik": null,  "yillik": null,  "katkiPuan": null },
-      { "ad": "Eğlence ve kültür",                     "kod": "eglence",     "aylik": null,  "yillik": null,  "katkiPuan": null },
-      { "ad": "Çeşitli mal ve hizmetler",              "kod": "cesitli",     "aylik": null,  "yillik": null,  "katkiPuan": null }
+      {
+        "ad": "Gıda ve alkolsüz içecekler",
+        "kod": "gida",
+        "aylik": 1.61,
+        "yillik": 37.53,
+        "katkiPuan": 8.94
+      },
+      {
+        "ad": "Konut, su, elektrik, gaz ve yakıtlar",
+        "kod": "konut",
+        "aylik": 2.25,
+        "yillik": 40.32,
+        "katkiPuan": 5.21
+      },
+      {
+        "ad": "Ulaştırma",
+        "kod": "ulasim",
+        "aylik": 2.59,
+        "yillik": 30.83,
+        "katkiPuan": 5.22
+      },
+      {
+        "ad": "Sağlık",
+        "kod": "saglik",
+        "aylik": 10.74,
+        "yillik": 43.89,
+        "katkiPuan": null
+      },
+      {
+        "ad": "Eğitim",
+        "kod": "egitim",
+        "aylik": null,
+        "yillik": 44.18,
+        "katkiPuan": null
+      },
+      {
+        "ad": "Lokanta ve oteller",
+        "kod": "lokanta",
+        "aylik": 2.28,
+        "yillik": 31.65,
+        "katkiPuan": null
+      },
+      {
+        "ad": "Alkollü içecekler ve tütün",
+        "kod": "tutun",
+        "aylik": null,
+        "yillik": 29.38,
+        "katkiPuan": null
+      },
+      {
+        "ad": "Giyim ve ayakkabı",
+        "kod": "giyim",
+        "aylik": -3.93,
+        "yillik": null,
+        "katkiPuan": null
+      },
+      {
+        "ad": "Mobilya ve ev eşyası",
+        "kod": "evesyasi",
+        "aylik": null,
+        "yillik": null,
+        "katkiPuan": null
+      },
+      {
+        "ad": "Haberleşme",
+        "kod": "haberlesme",
+        "aylik": null,
+        "yillik": null,
+        "katkiPuan": null
+      },
+      {
+        "ad": "Eğlence ve kültür",
+        "kod": "eglence",
+        "aylik": null,
+        "yillik": null,
+        "katkiPuan": null
+      },
+      {
+        "ad": "Çeşitli mal ve hizmetler",
+        "kod": "cesitli",
+        "aylik": null,
+        "yillik": null,
+        "katkiPuan": null
+      }
     ]
   },
-
   "enag": {
     "kaynak": "ENAG - Enflasyon Araştırma Grubu (bağımsız, resmî değildir)",
     "kaynakUrl": "https://enagrup.org/",
@@ -35,9 +105,12 @@
     "donemAdi": "Temmuz 2026",
     "aylik": 3.07,
     "yillik": 50.49,
-    "oncekiDonem": { "donem": "2026-06", "aylik": 1.94, "yillik": 51.49 }
+    "oncekiDonem": {
+      "donem": "2026-06",
+      "aylik": 1.94,
+      "yillik": 51.49
+    }
   },
-
   "faiz": {
     "politikaFaizi": {
       "kaynak": "TCMB - 1 hafta vadeli repo ihale faiz oranı",
@@ -51,9 +124,24 @@
       "yururlukTarihi": "2026-01-01",
       "not": "TCMB bu oranları her ayın sondan beşinci iş günü ilan eder. Bunlar AZAMİ oranlardır; bankan daha düşük uygulayabilir. Kendi ekstrende yazan oranı Ayarlar'dan gir.",
       "kademeler": [
-        { "altSinir": 0,      "ustSinir": 30000,  "akdiAylik": 3.25, "gecikmeAylik": 3.55 },
-        { "altSinir": 30000,  "ustSinir": 180000, "akdiAylik": 3.75, "gecikmeAylik": 4.05 },
-        { "altSinir": 180000, "ustSinir": null,   "akdiAylik": 4.25, "gecikmeAylik": 4.55 }
+        {
+          "altSinir": 0,
+          "ustSinir": 30000,
+          "akdiAylik": 3.25,
+          "gecikmeAylik": 3.55
+        },
+        {
+          "altSinir": 30000,
+          "ustSinir": 180000,
+          "akdiAylik": 3.75,
+          "gecikmeAylik": 4.05
+        },
+        {
+          "altSinir": 180000,
+          "ustSinir": null,
+          "akdiAylik": 4.25,
+          "gecikmeAylik": 4.55
+        }
       ],
       "nakitAvansAylik": 4.25
     },
@@ -61,55 +149,140 @@
       "kaynak": "BDDK kredi kartı asgari ödeme oranı düzenlemesi",
       "not": "Asgari ödeme oranı kart LİMİTİNE göre belirlenir, dönem borcuna göre değil.",
       "kademeler": [
-        { "limitUst": 50000, "oran": 20 },
-        { "limitUst": null,  "oran": 40 }
+        {
+          "limitUst": 50000,
+          "oran": 20
+        },
+        {
+          "limitUst": null,
+          "oran": 40
+        }
       ],
       "uyari": "Bir takvim yılı içinde üç kez asgari tutarın altında ödeme yapılırsa kart nakit çekime ve limit artırımına kapatılır; borcun tamamı ödenene kadar bu kısıt sürer."
     }
   },
-
   "krediSkoru": {
     "kaynak": "Findeks / KKB kredi notu",
     "kaynakUrl": "https://www.findeks.com/",
     "not": "Findeks'in herkese açık bir API'si yoktur; skor otomatik çekilemez. Skorunu Findeks'ten öğrenip buraya elle girersin.",
-    "aralik": { "min": 1, "max": 1900 },
+    "aralik": {
+      "min": 1,
+      "max": 1900
+    },
     "kademeler": [
-      { "ad": "Çok riskli",  "min": 1,    "max": 699,  "renk": "kritik" },
-      { "ad": "Orta riskli", "min": 700,  "max": 1099, "renk": "uyari" },
-      { "ad": "Az riskli",   "min": 1100, "max": 1499, "renk": "notr" },
-      { "ad": "İyi",         "min": 1500, "max": 1699, "renk": "iyi" },
-      { "ad": "Çok iyi",     "min": 1700, "max": 1900, "renk": "cokiyi" }
+      {
+        "ad": "Çok riskli",
+        "min": 1,
+        "max": 699,
+        "renk": "kritik"
+      },
+      {
+        "ad": "Orta riskli",
+        "min": 700,
+        "max": 1099,
+        "renk": "uyari"
+      },
+      {
+        "ad": "Az riskli",
+        "min": 1100,
+        "max": 1499,
+        "renk": "notr"
+      },
+      {
+        "ad": "İyi",
+        "min": 1500,
+        "max": 1699,
+        "renk": "iyi"
+      },
+      {
+        "ad": "Çok iyi",
+        "min": 1700,
+        "max": 1900,
+        "renk": "cokiyi"
+      }
     ],
     "bilesenler": [
-      { "ad": "Ödeme geçmişi",       "agirlik": 45, "aciklama": "Borçlarını zamanında ödemen. En ağır bileşen. Tek bir gecikme bile uzun süre iz bırakır." },
-      { "ad": "Mevcut hesap durumu", "agirlik": 22, "aciklama": "Açık kredilerinin ve kartlarının bugünkü durumu; gecikmede olan hesabın var mı." },
-      { "ad": "Kredi kullanım yoğunluğu", "agirlik": 18, "aciklama": "Kart limitinin ne kadarını kullandığın. %30'un altında tutmak skoru destekler." },
-      { "ad": "Yeni kredi/kart başvuruları", "agirlik": 8, "aciklama": "Kısa sürede çok sayıda başvuru risk sinyali sayılır." },
-      { "ad": "Kredi geçmişi uzunluğu", "agirlik": 7, "aciklama": "Ne kadar süredir düzenli ürün kullandığın. Eski kartını kapatmak geçmişini kısaltabilir." }
+      {
+        "ad": "Ödeme geçmişi",
+        "agirlik": 45,
+        "aciklama": "Borçlarını zamanında ödemen. En ağır bileşen. Tek bir gecikme bile uzun süre iz bırakır."
+      },
+      {
+        "ad": "Mevcut hesap durumu",
+        "agirlik": 22,
+        "aciklama": "Açık kredilerinin ve kartlarının bugünkü durumu; gecikmede olan hesabın var mı."
+      },
+      {
+        "ad": "Kredi kullanım yoğunluğu",
+        "agirlik": 18,
+        "aciklama": "Kart limitinin ne kadarını kullandığın. %30'un altında tutmak skoru destekler."
+      },
+      {
+        "ad": "Yeni kredi/kart başvuruları",
+        "agirlik": 8,
+        "aciklama": "Kısa sürede çok sayıda başvuru risk sinyali sayılır."
+      },
+      {
+        "ad": "Kredi geçmişi uzunluğu",
+        "agirlik": 7,
+        "aciklama": "Ne kadar süredir düzenli ürün kullandığın. Eski kartını kapatmak geçmişini kısaltabilir."
+      }
     ]
   },
-
   "kiymetliMaden": {
     "gramOns": 31.1034768,
     "not": "Gram fiyatı (TL) = ons fiyatı (USD) × USD/TRY ÷ 31,1034768. Uygulama hem altın hem gümüş için bu formülü kullanır.",
     "altin": {
-      "milyemAyar": { "24": 1.0, "22": 0.916, "18": 0.750, "14": 0.585 },
+      "milyemAyar": {
+        "24": 1.0,
+        "22": 0.916,
+        "18": 0.75,
+        "14": 0.585
+      },
       "sembol": "XAU"
     },
     "gumus": {
-      "milyemAyar": { "999": 0.999, "925": 0.925, "900": 0.900, "800": 0.800 },
+      "milyemAyar": {
+        "999": 0.999,
+        "925": 0.925,
+        "900": 0.9,
+        "800": 0.8
+      },
       "sembol": "XAG",
       "not": "Gümüş altından çok daha oynaktır ve sanayi talebine duyarlıdır; kısa vadede altına göre daha sert dalgalanır."
     }
   },
-
   "veriKaynaklari": {
     "not": "Uygulamanın kullandığı tüm canlı veri kaynakları ücretsiz ve API anahtarı gerektirmez. Sitede ücretli hiçbir servis çağrılmaz, reklam ve takip kodu yoktur.",
     "canli": [
-      { "ad": "open.er-api.com",  "veri": "USD/TRY, EUR/TRY", "ucretsiz": true, "anahtarsiz": true, "cors": true },
-      { "ad": "frankfurter.app",  "veri": "USD/TRY, EUR/TRY (ECB) — yedek", "ucretsiz": true, "anahtarsiz": true, "cors": true },
-      { "ad": "gold-api.com",     "veri": "Ons altın (XAU), ons gümüş (XAG)", "ucretsiz": true, "anahtarsiz": true, "cors": true },
-      { "ad": "Yahoo Finance / Stooq", "veri": "BIST 100 — yalnızca kendi Worker proxy'n üzerinden", "ucretsiz": true, "anahtarsiz": true, "cors": false }
+      {
+        "ad": "open.er-api.com",
+        "veri": "USD/TRY, EUR/TRY",
+        "ucretsiz": true,
+        "anahtarsiz": true,
+        "cors": true
+      },
+      {
+        "ad": "frankfurter.app",
+        "veri": "USD/TRY, EUR/TRY (ECB) — yedek",
+        "ucretsiz": true,
+        "anahtarsiz": true,
+        "cors": true
+      },
+      {
+        "ad": "gold-api.com",
+        "veri": "Ons altın (XAU), ons gümüş (XAG)",
+        "ucretsiz": true,
+        "anahtarsiz": true,
+        "cors": true
+      },
+      {
+        "ad": "Yahoo Finance / Stooq",
+        "veri": "BIST 100 — yalnızca kendi Worker proxy'n üzerinden",
+        "ucretsiz": true,
+        "anahtarsiz": true,
+        "cors": false
+      }
     ],
     "istekFreni": {
       "not": "Ücretsiz kaynakları yormamak için tarayıcı tarafında uygulanan sınırlar.",
@@ -118,5 +291,13 @@
       "elleYenilemeSaniye": 60,
       "gunlukIstekLimiti": 24
     }
+  },
+  "gizlilik": {
+    "_aciklama": "Gizlilik ve KVKK metninde gosterilen iletisim bilgileri. BOS BIRAKILAN ALANLAR arayuzde 'doldurulmali' uyarisiyla gorunur.",
+    "veriSorumlusu": "",
+    "iletisimEposta": "",
+    "iletisimAdres": "",
+    "webSitesi": "https://eraysenel.github.io/para-bilinci/",
+    "sonGuncelleme": "2026-08-03"
   }
 }

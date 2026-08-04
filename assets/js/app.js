@@ -19,11 +19,12 @@ import { mutfakGorunum } from './views/mutfak.js';
 import { skorGorunum } from './views/skor.js';
 import { okulGorunum, mufredatYukle } from './views/okul.js';
 import { ayarGorunum } from './views/ayarlar.js';
+import { gizlilikGorunum } from './views/gizlilik.js';
 
 const GORUNUMLER = [
   bugunGorunum, kararGorunum, akisGorunum, faturaGorunum, borcGorunum,
   enflasyonGorunum, yatirimGorunum, mutfakGorunum, skorGorunum,
-  okulGorunum, ayarGorunum
+  okulGorunum, gizlilikGorunum, ayarGorunum
 ];
 const HARITA = Object.fromEntries(GORUNUMLER.map(g => [g.ad, g]));
 
@@ -97,7 +98,7 @@ function menuCiz() {
   }
 
   if (alt) {
-    const sira = ['bugun', 'akis', 'faturalar', 'borc', 'kararlar', 'enflasyon', 'yatirim', 'mutfak', 'skor', 'okul', 'ayarlar'];
+    const sira = ['bugun', 'akis', 'faturalar', 'borc', 'kararlar', 'enflasyon', 'yatirim', 'mutfak', 'skor', 'okul', 'gizlilik', 'ayarlar'];
     alt.innerHTML = sira.map(ad => {
       const v = HARITA[ad];
       return `<button data-eylem="git" data-hedef="${ad}" class="${ad === aktif ? 'aktif' : ''}">
@@ -150,7 +151,8 @@ function kaynakDipnotu() {
         <div><b>Sayı uydurulmaz.</b> Çekilemeyen değer “—” kalır; projeksiyon içeren hesaplar “senaryo” etiketiyle ve varsayımı yazılarak gösterilir.</div>
         <div><b>Ücretsiz.</b> Yalnızca anahtar gerektirmeyen açık uç noktalar kullanılır; sitede ücretli hiçbir servis çağrılmaz, reklam ve takip kodu yoktur.</div>
         <div><b>Kaynakları yormaz.</b> Piyasa verisi ${kac(String(frenOzeti().onbellekOmruDk))} dakika önbellekte tutulur, denemeler arasında en az ${kac(String(frenOzeti().enKisaAralikDk))} dakika beklenir ve günde en fazla ${kac(String(frenOzeti().gunlukLimit))} istek yapılır.</div>
-        <div><b>Veriler cihazında.</b> Hiçbir kayıt sunucuya gönderilmez.</div>
+        <div><b>Veriler cihazında.</b> Hiçbir kayıt sunucuya gönderilmez; çerez, reklam ve izleme kodu yoktur.
+          <a href="#gizlilik" data-eylem="git" data-hedef="gizlilik">Gizlilik &amp; KVKK →</a></div>
         ${r ? `<div>Referans veri seti ${kac(r.guncellemeTarihi)} tarihinde güncellendi ·
           <a href="${kac(r.tufe.kaynakUrl)}" target="_blank" rel="noopener">TÜİK</a>
           <span class="ayir">·</span><a href="${kac(r.enag.kaynakUrl)}" target="_blank" rel="noopener">ENAG</a>
